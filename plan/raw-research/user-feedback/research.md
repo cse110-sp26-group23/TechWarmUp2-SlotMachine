@@ -36,7 +36,7 @@
 
 ---
 
-### Key Takeaways (for building)
+### Takeaways
 - Keep:
   - strong win animation + sound feedback
   - early free reward onboarding
