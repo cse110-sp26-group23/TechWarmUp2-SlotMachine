@@ -4,10 +4,12 @@ Responsive web deisgn allows web pages to appear visually pleasing to the users.
 
 ## Why Responsive Web Design Matters
 
-Responsive web design is improtnat because users may want to acccess websites on multiple different devices such as their mobiel phones, tablets, or laptops. A website should be able to scale propeoly across differnt screen sizes to make it user friendly. 
+Responsive web design is improtnat because users may want to acccess websites on multiple different devices such as their mobile phones, tablets, or laptops. A website should be able to scale propeoly across differnt screen sizes to make it user friendly. 
 
-## Core Principlles of Resposnive Web Design 
+## Core Principles of Responsive Web Design 
 
--[]
-
+- [ ] **Fluid Layouts**: Elements should resize with the screen. All boxes are flexible. Containers should adapt, and not stay rigid. 
+- [ ] **Flexible Media**: Images and media are flexible and their sizes can change. This allows websites to maintian a consistent design. 
+- [ ] **Media Queries**: Special conditonal rules where CSS is applied based on screen conditions. This allows layout for mobile devices, tablets, and laptops to eb adjusted accordingly. 
+  - [ ] 
 
