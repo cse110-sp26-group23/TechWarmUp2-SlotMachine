@@ -1,5 +1,9 @@
 # HTML & CSS Practices
 
+**TLDR:** HTML builds web page structure, CSS styles it. For frontend frameworks, the three main options are React (component-based, great performance but complex setup), Tailwind CSS (utility-first styling, fast but can get cluttered), and Angular (full-featured for large apps, but overkill for small projects). All three have a steep learning curve. 
+
+**Key tips:** keep HTML and CSS separate, avoid inline styles, use classes over IDs, start with HTML before CSS, and always comment your code.
+
 ## What is HTML & CSS?
 HTML is the standard markup language used to **create web pages**. HTML elements are the *building blocks of web pages*, allowing developers to embed multimedia, create forms, and design the overall layout.
 
