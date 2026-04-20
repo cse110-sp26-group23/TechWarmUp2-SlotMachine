@@ -1,5 +1,7 @@
 # Accessibility & Language Support
 
+![image of accessibility stuff](https://teaching.pitt.edu/wp-content/uploads/2024/03/accessibility-header.jpg)
+
 ## Accessibility
 
 Accessibility ensures that websites are usable by as many people as possible, regardless of their physical or cognitive abilities, and what device they are using. Accessibility benefits:
