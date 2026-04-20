@@ -5,7 +5,14 @@ HTML is the standard markup language used to **create web pages**. HTML elements
 
 CSS stands for Cascading Style Sheets and it is used to **style web documents**. It controls the layout, colors, fonts, and overall look of a web page. CSS is also recommended by World Wide Web Consortium (W3C)[https://www.w3.org/].
 
+![Differences](./differences.png)
+
 The above information is from Geeks for Geeks. 
+
+### Common Frontend Frameworks
+A web design framework offers a foundation that we can build upon, by eliminating repetitive coding by *offering pre-built components and a standardized structure*.
+
+![Frameworks](./frameworks.png)
 
 ### Tips from Forums: 
 *   Keep your style and your markup separate
