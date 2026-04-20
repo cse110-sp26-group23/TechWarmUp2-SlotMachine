@@ -3,13 +3,11 @@
 Responsive web deisgn allows web pages to appear visually pleasing to the users. Usign HTML and CSS, responsive web design automatically resize, hides, shrink, or enlarge a website. In general, automatically adjusting for various screen 
 sizes. 
 
-Both grids and layouts are essential components of responsive web design. Grids are the structure that layouts are designed on. Grids provide an organized way to effeciently create layouts in web and mobile designs. On the other hand,layout allows designers to utilize the space available to create a design that suits the user best. 
-
 ---
 
 ## Why Responsive Web Design Matters
 
-Responsive web design is improtnat because users may want to acccess websites on multiple different devices such as their mobile phones, tablets, or laptops. A website should be able to scale propeoly across differnt screen sizes to make it user friendly. 
+Responsive web design is important because users may want to acccess websites on multiple different devices such as their mobile phones, tablets, or laptops. A website should be able to scale propeoly across differnt screen sizes to make it user friendly. 
 
 ---
 
@@ -37,7 +35,52 @@ Breakpoints defines a screen size where the design should adjust to a differnet 
 - [ ] Should there be changes from the standard flow or content and layout?
 
 ---
+## Grids and Layouts
+Both grids and layouts are essential components of responsive web design. Grids are the structure that layouts are designed on. Grids provide an organized way to effeciently create layouts in web and mobile designs. On the other hand,layout allows designers to utilize the space available to create a design that suits the user best. 
+
+---
+
+## Fixed vs Fluids Layout
+
+### Pros of Fixed Layout
+- [ ] Easier to design and customize 
+- [ ] Consistent widths across browsers, so there is no need for min and max width
+- [ ] Content remain legible on larger screens
+
+### Cons of Fixed Layout
+- [ ] May result in excessive white space for users with larger screens
+  - [ ] Can affect visual balance and other design principles 
+- [ ] Not as user friendly
+- [ ] Smalelr screen resolutions may require a horizontal scroll bar
+
+### Pros of Fluid Layout
+- [ ] More user friendlt since it can eb adjsuted to fit user's set up
+- [ ] More visually adaptable across devices 
+- [ ] Could potentially not require a horizontal scroll bar on smaller screens
+  
+### Cons of Fluid Layout
+- [ ] Designer has less ocntrol over layout
+- [ ] May require multiple widths to accomodate differnt screen sizes
+  - [ ] Could be harder to manage
+- [ ] Lack of content can make it visually unappealing and empty
+  
+---
+
+## What to Consider for Our Project
+
+We should ensure that applications work well and is user friendly on multiple devices with differnt screen sizes using responsive web design. 
+
+This can be done by: 
+- [ ] Ensure texts are legible on smaller screens
+- [ ] Use media queries to adjust layouts at different breakpoints
+- [ ] Use fluid layouts to adjust to different screen sizes
+
+---
+
 ## Key Words
 - [ ] **breakpoint**: refers to the screen-size range (min and mx width) for which a specific layout will be shown 
-- [ ] **grids**: made up of columns, gutters, adn margins that provide a structure for the layout of elements on a page
+- [ ] **grids**: made up of columns, gutters, and margins that provide a structure for the layout of elements on a page
 - [ ] **layout**: refers how differnt contents and UI elements are arranged and positioned on a page.
+  - [ ] **fixed layout**: uses fixed pixel sizes and does not change with screen size
+  - [ ] **fluid layout**: uses flexible sizing so elements resize with the screen
+- [ ] **resolution**: the number of pixels on a screen that affects how content is displayed
