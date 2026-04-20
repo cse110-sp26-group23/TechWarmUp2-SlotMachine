@@ -30,6 +30,7 @@ make testing time more optimal and prevent bottlenecking
 Focus on architecture and securit (DevSecOps) into testing and handling CI/CD within microservice architectures
 
 These tests should run when someone commits new code, usually before being merged, to ensure new code is not broken. These can be ran locally as well
+
 ---
 ## Unit Testing
 ---
