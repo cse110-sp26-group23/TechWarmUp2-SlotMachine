@@ -1,6 +1,7 @@
 # Accessibility & Language Support
 
 ![image of accessibility stuff](https://teaching.pitt.edu/wp-content/uploads/2024/03/accessibility-header.jpg)
+#####Some icons may not be relevant in this topic
 
 ## Accessibility
 
