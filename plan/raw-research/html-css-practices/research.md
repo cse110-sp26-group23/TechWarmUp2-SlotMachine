@@ -83,3 +83,5 @@ A web design framework offers a foundation that we can build upon, by eliminatin
 *   [FreeCodeCamp Forum](https://forum.freecodecamp.org/t/best-practices-in-html-css/37441)
 *   [Reddit Forum](https://www.reddit.com/r/Frontend/comments/b0snvb/frontenders_of_reddit_whats_the_best_practice_of/)
 *   [GeeksForGeeks: *Difference between HTML and CSS*](https://www.geeksforgeeks.org/css/difference-between-html-and-css/)
+*   [GeeksForGeeks: Top 10 Front-End Frameworks in 2025](https://www.geeksforgeeks.org/blogs/top-front-end-frameworks/)
+*   [Hubspot Blog: I Tried 10 Web Design Frameworks to Find the Best Ones](https://blog.hubspot.com/website/web-design-frameworks)
