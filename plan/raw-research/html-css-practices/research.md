@@ -14,7 +14,7 @@ A web design framework offers a foundation that we can build upon, by eliminatin
 
 ![Frameworks](./frameworks.png)
 
-1. <u>React</u> is an open-source JavaScript library developed by **Facebook** in 2013 for building user interfaces. It lets developers create reusable, component-based UIs for web and mobile applications that can be combined into complex interfaces.
+1. ***React*** is an open-source JavaScript library developed by **Facebook** in 2013 for building user interfaces. It lets developers create reusable, component-based UIs for web and mobile applications that can be combined into complex interfaces.
 * **Pros:**
    * Fast rendering with Virtual DOM
        * *structured representation of a web page that the browser creates when it loads HTML*
@@ -27,7 +27,7 @@ A web design framework offers a foundation that we can build upon, by eliminatin
        * *syntax extension for JavaScript used mainly with React. It lets you write HTML-like code directly inside JavaScript*
    * Setup can be complex
      
-2. <u>Tailwind CSS</u> is a utility-first(*Instead of writing your own CSS, you use ready-made classes to style elements quickly.*) CSS framework used to quickly build responsive web designs using pre-built classes. It is highly customizable and provides many configuration options. It includes utility classes for layout, typography, colors, borders, shadows, and more, allowing developers to style elements efficiently without writing much custom CSS.
+2. ***Tailwind CSS*** is a utility-first(*Instead of writing your own CSS, you use ready-made classes to style elements quickly.*) CSS framework used to quickly build responsive web designs using pre-built classes. It is highly customizable and provides many configuration options. It includes utility classes for layout, typography, colors, borders, shadows, and more, allowing developers to style elements efficiently without writing much custom CSS.
 * **Pros:** 
    * Fast styling with utility classes
    * Highly customizable design system
@@ -39,7 +39,7 @@ A web design framework offers a foundation that we can build upon, by eliminatin
    * Can feel cluttered in HTML
    * Requires optimization to avoid large builds
      
-3. <u>Angular</u> is a TypeScript-based open-source front-end framework used for building dynamic single-page applications. It provides a structured, full-featured environment for developing large-scale web apps.
+3. ***Angular*** is a TypeScript-based open-source front-end framework used for building dynamic single-page applications. It provides a structured, full-featured environment for developing large-scale web apps.
 * **Pros:**
    * Two-way data binding
        * *The data changes → the UI updates automatically*
