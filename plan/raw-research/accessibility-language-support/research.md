@@ -1,5 +1,7 @@
 # Accessibility & Language Support
 
+## Accessibility
+
 Accessibility ensures that websites are usable by as many people as possible, regardless of their physical or cognitive abilities, and what device they are using. Accessibility benefits:
 * Users on small screens.
 * People with slow internet connections.
@@ -23,3 +25,4 @@ The article [What is Accessibility?](https://developer.mozilla.org/en-US/docs/Le
 * **Keyboard Friendly:** Ensure all interactive elements can be reached and triggered using only the `Tab` and `Enter` keys.
 * **Test Early and Often:** Use automated auditing tools (like Lighthouse) and manual testing with screen readers.
 
+## Language Support
