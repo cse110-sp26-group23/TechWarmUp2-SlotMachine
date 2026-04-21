@@ -34,7 +34,8 @@
       "Bash(node *)",
       "Bash(wsl *)",
       "Bash(node_modules/.bin/stylelint \"src/client/scss/**/*.scss\")",
-      "Bash(node_modules/.bin/htmlhint src/client/index.html)"
+      "Bash(node_modules/.bin/htmlhint src/client/index.html)",
+      "Bash(git commit *)"
     ]
   }
 }

@@ -84,4 +84,7 @@ Built the entire project in one run following the creation order from the plan:
 - Stylelint flagged a missing empty line before an inline comment in `_reels.scss`; added it.
 - npm scripts fail on the WSL UNC path in Windows; CSS build and linters invoked directly via `node node_modules/...` instead.
 
-**Commit Hash:** TBD
+**Commit Hash:** 7a14506
+
+**Time:** 18m 57s 
+**Tokens:** 63.5k
