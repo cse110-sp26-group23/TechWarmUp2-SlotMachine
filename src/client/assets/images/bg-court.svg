@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <!-- PLACEHOLDER: Replace with real hardwood court texture image (JPG/PNG/WebP) -->
+  <defs>
+    <linearGradient id="court" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e18"/>
+      <stop offset="100%" stop-color="#040609"/>
+    </linearGradient>
+    <!-- Subtle court line overlay -->
+    <pattern id="lines" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="40" stroke="#f26522" stroke-width="0.3" stroke-opacity="0.08"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="400" fill="url(#court)"/>
+  <rect width="800" height="400" fill="url(#lines)"/>
+</svg>

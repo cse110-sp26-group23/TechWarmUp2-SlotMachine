@@ -1,0 +1,55 @@
+@use 'variables' as *;
+
+// Breakpoints: 500 px (larger phones), 900 px (tablets), 1200 px (desktops)
+
+@media (width >= 500px) {
+  :root {
+    --reel-cell-height: 90px;
+  }
+
+  .app {
+    padding: $space-sm $space-md;
+  }
+
+  .app__title {
+    font-size: $font-size-xl;
+  }
+
+  .spin-button {
+    font-size: $font-size-2xl;
+    min-height: 60px;
+  }
+}
+
+@media (width >= 900px) {
+  :root {
+    --reel-cell-height: 115px;
+  }
+
+  body {
+    padding: $space-md;
+  }
+
+  .app {
+    max-width: 720px;
+    gap: $space-md;
+  }
+
+  .stats__item {
+    gap: $space-2xl;
+  }
+}
+
+@media (width >= 1200px) {
+  :root {
+    --reel-cell-height: 130px;
+  }
+
+  .app {
+    max-width: 860px;
+  }
+
+  .paytable__table {
+    font-size: $font-size-sm;
+  }
+}

@@ -3,7 +3,7 @@ import js from '@eslint/js';
 export default [
   js.configs.recommended,
   {
-    files: ['client/js/**/*.js', 'server/**/*.js'],
+    files: ['src/client/js/**/*.js', 'src/server/**/*.js'],
     rules: {
       'no-var': 'error',
       'eqeqeq': ['error', 'always'],
@@ -21,6 +21,8 @@ export default [
         window: 'readonly',
         document: 'readonly',
         AudioContext: 'readonly',
+        Audio: 'readonly',
+        getComputedStyle: 'readonly',
         setTimeout: 'readonly',
         setInterval: 'readonly',
         clearInterval: 'readonly',

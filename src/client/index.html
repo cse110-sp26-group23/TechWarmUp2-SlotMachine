@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hoops Slots — Basketball Slot Machine</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <main class="app">
+
+      <!-- ── Top: header ── -->
+      <header class="app__header">
+        <h1 class="app__title">🏀 Hoops Slots</h1>
+        <button
+          class="mute-toggle"
+          id="muteToggle"
+          aria-label="Mute audio"
+          aria-pressed="false"
+          type="button"
+        >
+          <span class="mute-toggle__icon" aria-hidden="true">🔊</span>
+        </button>
+      </header>
+
+      <!-- ── Top: stats bar ── -->
+      <section class="stats" aria-label="Game statistics">
+        <div class="stats__item">
+          <span class="stats__label">Credits</span>
+          <strong class="stats__value" id="creditsDisplay">1000</strong>
+        </div>
+        <div class="stats__item">
+          <span class="stats__label">Bet</span>
+          <strong class="stats__value" id="betDisplay">10</strong>
+        </div>
+        <div class="stats__item">
+          <span class="stats__label">Last Win</span>
+          <strong class="stats__value" id="lastWinDisplay">0</strong>
+        </div>
+      </section>
+
+      <!-- ── Win message ── -->
+      <section class="win-display" aria-live="polite" aria-atomic="true">
+        <p class="win-display__message" id="winMessage"></p>
+      </section>
+
+      <!-- ── Middle: 5×3 reels (takes most vertical space) ── -->
+      <section class="reels" aria-label="Slot machine reels">
+        <!-- Payline indicator bar across the middle row -->
+        <div class="reels__payline" aria-hidden="true"></div>
+
+        <div class="reels__grid">
+          <div class="reel" id="reel0" role="img" aria-label="Reel 1" aria-live="polite">
+            <div class="reel__window">
+              <div class="reel__strip" id="strip0"></div>
+            </div>
+          </div>
+          <div class="reel" id="reel1" role="img" aria-label="Reel 2" aria-live="polite">
+            <div class="reel__window">
+              <div class="reel__strip" id="strip1"></div>
+            </div>
+          </div>
+          <div class="reel" id="reel2" role="img" aria-label="Reel 3" aria-live="polite">
+            <div class="reel__window">
+              <div class="reel__strip" id="strip2"></div>
+            </div>
+          </div>
+          <div class="reel" id="reel3" role="img" aria-label="Reel 4" aria-live="polite">
+            <div class="reel__window">
+              <div class="reel__strip" id="strip3"></div>
+            </div>
+          </div>
+          <div class="reel" id="reel4" role="img" aria-label="Reel 5" aria-live="polite">
+            <div class="reel__window">
+              <div class="reel__strip" id="strip4"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Bottom: controls ── -->
+      <section class="controls" aria-label="Game controls">
+        <div class="bet-controls">
+          <button
+            class="bet-controls__button"
+            id="betDecreaseButton"
+            aria-label="Decrease bet"
+            type="button"
+          >−</button>
+          <span class="bet-controls__label" aria-live="polite" aria-atomic="true">
+            Bet: <strong id="betAmount">10</strong>
+          </span>
+          <button
+            class="bet-controls__button"
+            id="betIncreaseButton"
+            aria-label="Increase bet"
+            type="button"
+          >+</button>
+        </div>
+
+        <button
+          class="spin-button"
+          id="spinButton"
+          aria-label="Spin the reels"
+          type="button"
+        >
+          SPIN
+        </button>
+
+        <!-- Collapsible paytable -->
+        <div class="paytable" id="paytable">
+          <button
+            class="paytable__toggle"
+            id="paytableToggle"
+            aria-expanded="false"
+            aria-controls="paytableBody"
+            type="button"
+          >
+            <span>Paytable — Winning Combinations</span>
+            <em class="paytable__toggle__arrow" aria-hidden="true">▼</em>
+          </button>
+
+          <div class="paytable__body" id="paytableBody" role="region" aria-label="Paytable">
+            <table class="paytable__table">
+              <caption class="visually-hidden">Basketball slot machine winning combinations and payouts</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Symbol</th>
+                  <th scope="col">2× left</th>
+                  <th scope="col">3× left</th>
+                  <th scope="col">4× left</th>
+                  <th scope="col">5× left</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>🏀 Basketball</td>
+                  <td>2× bet</td>
+                  <td>4× bet</td>
+                  <td>8× bet</td>
+                  <td>20× bet</td>
+                </tr>
+                <tr>
+                  <td>👟 Sneaker</td>
+                  <td>2× bet</td>
+                  <td>5× bet</td>
+                  <td>12× bet</td>
+                  <td>30× bet</td>
+                </tr>
+                <tr>
+                  <td>👕 Jersey</td>
+                  <td>2× bet</td>
+                  <td>6× bet</td>
+                  <td>20× bet</td>
+                  <td>50× bet</td>
+                </tr>
+                <tr>
+                  <td>🏆 Trophy</td>
+                  <td>2× bet</td>
+                  <td>12× bet</td>
+                  <td>40× bet</td>
+                  <td>100× bet</td>
+                </tr>
+                <tr>
+                  <td>⭐ All-Star</td>
+                  <td>3× bet</td>
+                  <td>75× bet</td>
+                  <td>300× bet</td>
+                  <td>1000× bet</td>
+                </tr>
+                <tr>
+                  <td>🔥 Hot Streak</td>
+                  <td>5× bet</td>
+                  <td>200× bet</td>
+                  <td>1000× bet</td>
+                  <td>3000× bet</td>
+                </tr>
+                <tr>
+                  <td>💍 Ring</td>
+                  <td>10× bet</td>
+                  <td>500× bet</td>
+                  <td>2500× bet</td>
+                  <td>10000× bet</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="paytable__note">Wins count consecutive matches from the leftmost reel on the middle row.</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Visual effects layer (populated by effects.js) -->
+    <div class="particles-container" id="particlesContainer" aria-hidden="true"></div>
+
+    <script type="module" src="js/effects.js"></script>
+    <script type="module" src="js/audio.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/ui.js"></script>
+  </body>
+</html>

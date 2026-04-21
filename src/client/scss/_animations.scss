@@ -1,0 +1,58 @@
+@use 'variables' as *;
+
+// Reel stop bounce — called after strip lands on final symbols
+@keyframes reel-stop-bounce {
+  0% { transform: translateY(-6px); }
+  60% { transform: translateY(2px); }
+  100% { transform: translateY(0); }
+}
+
+// Win glow — green for small wins
+@keyframes pulse-glow-green {
+  0%, 100% { box-shadow: 0 0 6px $color-win-small; }
+  50% { box-shadow: 0 0 22px $color-win-small; }
+}
+
+// Win glow — orange for big wins
+@keyframes pulse-glow-orange {
+  0%, 100% { box-shadow: 0 0 6px $color-win-big; border-color: $color-win-big; }
+  50% { box-shadow: 0 0 32px $color-win-big; border-color: $color-win-big; }
+}
+
+// Jackpot rainbow border cycle
+@keyframes jackpot-rainbow {
+  0% { border-color: $color-gold; box-shadow: 0 0 16px $color-gold; }
+  25% { border-color: $color-accent; box-shadow: 0 0 30px $color-accent; }
+  50% { border-color: $color-win-small; box-shadow: 0 0 40px $color-win-small; }
+  75% { border-color: #80f; box-shadow: 0 0 40px #80f; }
+  100% { border-color: $color-gold; box-shadow: 0 0 16px $color-gold; }
+}
+
+// Full-screen flash on big/jackpot wins
+@keyframes screen-flash {
+  0%, 100% { opacity: 0; }
+  10%, 90% { opacity: 0.12; }
+  50% { opacity: 0.25; }
+}
+
+// Credit counter pop when updated
+@keyframes credit-bump {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); color: $color-gold; }
+}
+
+// Confetti particle fall (applied via JS effects module)
+@keyframes particle-fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+.particle {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: $z-particles;
+  animation: particle-fall linear forwards;
+}

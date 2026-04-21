@@ -44,3 +44,44 @@ Built the entire project in one run following the creation order from the plan:
 
 **Time:** 15m 12s
 **Tokens** 54.2k
+
+---
+
+## Entry 2
+
+**Goal:** Apply Refinement 1 — restructure project into `src/`, basketball theme, 5×3 reel grid, collapsible paytable, background image setup, scrolling reel animation, improved mobile layout, visual effects system, background music system, and updated README.
+
+**Prompt:** "Continue working on this slot machine app, following the refinement directions in src/refinement-1.md"
+
+**Summary:**
+
+1. **Project restructure** — `git mv` moved `client/`, `server/`, and `tests/` into `src/`. Updated all path references in `package.json`, `playwright.config.js`, `eslint.config.js`, and `src/server/server.js` (which now uses `import.meta.url` + `path.join` for a robust absolute path to `src/client`).
+
+2. **Basketball theme** — Replaced 7 fruit/casino symbols (Cherry, Lemon, …) with 7 basketball symbols: Basketball 🏀 (wt 350), Sneaker 👟 (280), Jersey 👕 (200), Trophy 🏆 (100), All-Star ⭐ (45), Hot Streak 🔥 (20), Championship Ring 💍 (5). Color palette updated to NBA orange (#f26522) + arena dark (#0a0e1a).
+
+3. **5×3 reels and new game math** — Server now returns `reels` as a 2D array (5 columns × 3 rows) plus `payline` (middle row), `matchCount`, and existing fields. `paytable.js` uses per-symbol `payouts: {2, 3, 4, 5}` multiplier maps and `countConsecutiveMatch()` left-to-right win logic. Simulated RTP ~94.2%, hit frequency ~25.2%.
+
+4. **Scrolling reel animation** — Each reel uses a `.reel__strip` div containing 22 random cells + 3 final cells. On spin, a CSS `cubic-bezier` transition scrolls the strip from `translateY(0)` to `translateY(−22 × cellHeight)`, landing on the correct symbols. Cell height is driven by `--reel-cell-height` CSS custom property updated at each breakpoint, read by JS via `getComputedStyle`.
+
+5. **Collapsible paytable** — `<div class="paytable">` toggled open/closed by `paytable--open` class; CSS `max-height` transition animates the collapse. The toggle button sets `aria-expanded` for screen readers.
+
+6. **Background image setup** — Created `src/client/assets/images/` with two SVG placeholder files (`bg-arena.svg` for the full page, `bg-court.svg` for the reel container). Both have comments indicating where to substitute real images.
+
+7. **Background music system** — Replaced the interval-based ambient tone with `startBackgroundMusic()` / `stopBackgroundMusic()` in `audio.js`. Loads `assets/audio/bg-music.mp3` via `HTMLAudioElement`; a missing file is silently ignored so the game runs without the file present.
+
+8. **Visual effects module** — New `src/client/js/effects.js` exports `addScreenFlash()` (full-screen overlay) and `spawnConfetti()` (60 animated `.particle` elements with random colors, sizes, positions, and durations).
+
+9. **Mobile-first vertical layout** — Stats bar and header at top, reels occupy `flex: 1` to fill remaining vertical space, controls at the bottom. Max-width scales from 560 px → 720 px → 860 px across breakpoints.
+
+10. **Tests updated** — All 5 unit test files rewritten for the new symbol set and 5-reel API shape. 43/43 tests pass.
+
+11. **README** — Added full launch instructions, port configuration, development commands, and project structure.
+
+**Reflection:**
+- The `TOTAL_CELLS` constant was declared but unused (ESLint caught it); removed.
+- `Audio` and `getComputedStyle` globals were missing from `eslint.config.js`; added them.
+- One paytable test used trophy 3-match (12×) to assert "big" win — but 12 < 15 (the big threshold), so it's correctly "small". Fixed the test to use All-Star 3-match (75×).
+- Stylelint flagged a missing empty line before an inline comment in `_reels.scss`; added it.
+- npm scripts fail on the WSL UNC path in Windows; CSS build and linters invoked directly via `node node_modules/...` instead.
+
+**Commit Hash:** TBD

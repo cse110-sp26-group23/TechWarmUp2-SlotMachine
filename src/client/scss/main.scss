@@ -1,0 +1,8 @@
+// Entry point — imports all partials in dependency order
+
+@use 'variables' as *;
+@use 'layout';
+@use 'reels';
+@use 'controls';
+@use 'animations';
+@use 'responsive';

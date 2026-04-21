@@ -1,0 +1,379 @@
+/**
+ * @fileoverview DOM manipulation, strip animation, and event wiring for the basketball slot machine.
+ * @author Brendan Barber
+ * @part-of CSE 110 Tech Warm-Up 2
+ */
+
+import { postSpin } from './api.js';
+import { playSpinSound, playStopTickSound, playWinSound } from './audio.js';
+import { spawnConfetti, addScreenFlash } from './effects.js';
+
+// Basketball symbol emoji map — mirrors server paytable IDs
+const SYMBOL_EMOJI = {
+  basketball: '🏀',
+  sneaker:    '👟',
+  jersey:     '👕',
+  trophy:     '🏆',
+  star:       '⭐',
+  flame:      '🔥',
+  ring:       '💍',
+};
+
+const SYMBOL_LABEL = {
+  basketball: 'Basketball',
+  sneaker:    'Sneaker',
+  jersey:     'Jersey',
+  trophy:     'Trophy',
+  star:       'All-Star',
+  flame:      'Hot Streak',
+  ring:       'Championship Ring',
+};
+
+const SYMBOL_IDS = Object.keys(SYMBOL_EMOJI);
+
+const MIN_BET = 1;
+const MAX_BET = 100;
+const BET_STEP = 5;
+
+// Scrolling strip constants
+const SPIN_CELL_COUNT = 22;  // random cells above the 3 final cells
+const STOP_STAGGER_MS = 260; // delay between each reel stopping
+
+/** @type {number} */
+let currentCredits = 1000;
+
+/** @type {number} */
+let currentBet = 10;
+
+/** @type {boolean} */
+let isSpinning = false;
+
+// DOM references
+const spinButton = document.getElementById('spinButton');
+const betDecreaseButton = document.getElementById('betDecreaseButton');
+const betIncreaseButton = document.getElementById('betIncreaseButton');
+const betAmountLabel = document.getElementById('betAmount');
+const betDisplay = document.getElementById('betDisplay');
+const creditsDisplay = document.getElementById('creditsDisplay');
+const lastWinDisplay = document.getElementById('lastWinDisplay');
+const winMessage = document.getElementById('winMessage');
+const muteToggle = document.getElementById('muteToggle');
+const muteIcon = muteToggle.querySelector('.mute-toggle__icon');
+const paytableEl = document.getElementById('paytable');
+const paytableToggle = document.getElementById('paytableToggle');
+
+/**
+ * Reads the --reel-cell-height CSS custom property set by the SCSS responsive rules.
+ * @returns {number} Cell height in pixels.
+ */
+function getCellHeight() {
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue('--reel-cell-height')
+    .trim();
+  return parseFloat(raw) || 75;
+}
+
+/**
+ * Returns a random symbol emoji for populating spin strips.
+ * @returns {string} An emoji string.
+ */
+function randomEmoji() {
+  return SYMBOL_EMOJI[SYMBOL_IDS[Math.floor(Math.random() * SYMBOL_IDS.length)]];
+}
+
+/**
+ * Creates a single reel cell element.
+ * @param {string} emoji - Symbol emoji to display.
+ * @returns {HTMLElement}
+ */
+function createCell(emoji) {
+  const cell = document.createElement('div');
+  cell.className = 'reel__cell';
+  const sym = document.createElement('span');
+  sym.className = 'reel__symbol';
+  sym.textContent = emoji;
+  cell.appendChild(sym);
+  return cell;
+}
+
+/**
+ * Initialises or resets a reel strip with SPIN_CELL_COUNT random cells followed
+ * by the three final cells (top, mid, bot). Resets transform so the strip
+ * begins at the top of the scroll range.
+ * @param {number} reelIndex - 0–4.
+ * @param {string} topId - Symbol id for visible top row.
+ * @param {string} midId - Symbol id for middle (payline) row.
+ * @param {string} botId - Symbol id for visible bottom row.
+ */
+function setupStrip(reelIndex, topId, midId, botId) {
+  const strip = document.getElementById(`strip${reelIndex}`);
+  strip.innerHTML = '';
+  strip.style.transition = 'none';
+  strip.style.transform = 'translateY(0)';
+
+  for (let i = 0; i < SPIN_CELL_COUNT; i++) {
+    strip.appendChild(createCell(randomEmoji()));
+  }
+  strip.appendChild(createCell(SYMBOL_EMOJI[topId] ?? '?'));
+  strip.appendChild(createCell(SYMBOL_EMOJI[midId] ?? '?'));
+  strip.appendChild(createCell(SYMBOL_EMOJI[botId] ?? '?'));
+}
+
+/**
+ * Scrolls a reel strip from the top to its final position (revealing the 3 final
+ * symbols) using a CSS transition. The strip must already be set up via setupStrip.
+ * @param {number} reelIndex - 0–4.
+ * @param {number} spinDuration - Duration of the scroll animation in ms.
+ * @returns {Promise<void>} Resolves when the animation completes.
+ */
+function animateStrip(reelIndex, spinDuration) {
+  return new Promise((resolve) => {
+    const strip = document.getElementById(`strip${reelIndex}`);
+    const cellHeight = getCellHeight();
+    const targetOffset = SPIN_CELL_COUNT * cellHeight;
+
+    // Force a reflow so the browser registers the initial transform=0 state
+    // before we apply the transition — otherwise the transition won't play.
+    void strip.offsetWidth;
+
+    strip.style.transition = `transform ${spinDuration}ms cubic-bezier(0.15, 0, 0.25, 1)`;
+    strip.style.transform = `translateY(-${targetOffset}px)`;
+
+    setTimeout(resolve, spinDuration);
+  });
+}
+
+/**
+ * Updates the ARIA label on a reel after it stops.
+ * @param {number} reelIndex - 0–4.
+ * @param {string} symbolId - The payline symbol id.
+ */
+function updateReelAriaLabel(reelIndex, symbolId) {
+  const reel = document.getElementById(`reel${reelIndex}`);
+  const label = SYMBOL_LABEL[symbolId] ?? symbolId;
+  reel.setAttribute('aria-label', `Reel ${reelIndex + 1} showing ${label}`);
+}
+
+/**
+ * Applies win-tier visual classes to the winning reels (consecutive from left).
+ * @param {string} winTier - 'none' | 'small' | 'big' | 'jackpot'.
+ * @param {number} matchCount - Number of reels from the left that matched.
+ */
+function applyWinAnimation(winTier, matchCount) {
+  if (winTier === 'none') {
+    return;
+  }
+
+  const winClass = `reel--win-${winTier}`;
+
+  for (let i = 0; i < matchCount; i++) {
+    document.getElementById(`reel${i}`).classList.add(winClass);
+  }
+
+  if (winTier === 'big' || winTier === 'jackpot') {
+    addScreenFlash();
+  }
+  if (winTier === 'jackpot') {
+    spawnConfetti();
+  }
+}
+
+/**
+ * Removes all win-state classes from every reel.
+ */
+function clearWinClasses() {
+  for (let i = 0; i < 5; i++) {
+    const reel = document.getElementById(`reel${i}`);
+    reel.classList.remove('reel--win-small', 'reel--win-big', 'reel--win-jackpot');
+  }
+}
+
+/**
+ * Shows a win message then fades it after 2.5 s.
+ * @param {string} text - Message to display.
+ */
+function showWinMessage(text) {
+  winMessage.textContent = text;
+  winMessage.classList.add('visible');
+  setTimeout(() => winMessage.classList.remove('visible'), 2500);
+}
+
+/**
+ * Updates the credits display with a bump animation.
+ * @param {number} amount - New credit total.
+ */
+function updateCreditsDisplay(amount) {
+  creditsDisplay.textContent = amount;
+  creditsDisplay.classList.remove('stats__value--bump');
+  void creditsDisplay.offsetWidth;
+  creditsDisplay.classList.add('stats__value--bump');
+}
+
+/**
+ * Updates the bet amount labels and toggles boundary button states.
+ */
+function refreshBetDisplay() {
+  betAmountLabel.textContent = currentBet;
+  betDisplay.textContent = currentBet;
+  betDecreaseButton.disabled = currentBet <= MIN_BET;
+  betIncreaseButton.disabled = currentBet >= MAX_BET;
+}
+
+/**
+ * Runs the full spin sequence: sets up strips, triggers scrolling animation reel by
+ * reel (staggered), then shows win feedback when all reels have landed.
+ * @param {string[][]} reels - 2D array [reel][row] from server (5 reels × 3 rows).
+ * @param {string[]} payline - Array of 5 payline symbol ids (middle row).
+ * @param {number} payout - Win amount in credits.
+ * @param {number} newCredits - Updated credit balance.
+ * @param {string} winTier - 'none' | 'small' | 'big' | 'jackpot'.
+ * @param {number} matchCount - Consecutive matching reels from the left.
+ */
+async function runSpinSequence(reels, payline, payout, newCredits, winTier, matchCount) {
+  clearWinClasses();
+
+  // Set up all 5 strips before starting (determine outcome before animation)
+  for (let i = 0; i < 5; i++) {
+    setupStrip(i, reels[i][0], reels[i][1], reels[i][2]);
+  }
+
+  playSpinSound();
+
+  // Base spin duration increases per reel for suspense
+  const baseDuration = 900;
+
+  // Animate each reel sequentially with stagger
+  for (let i = 0; i < 5; i++) {
+    const duration = baseDuration + i * STOP_STAGGER_MS;
+    if (i === 0) {
+      animateStrip(i, duration);
+    } else {
+      // Start each subsequent reel slightly after the previous
+      setTimeout(() => {
+        animateStrip(i, duration);
+      }, i * STOP_STAGGER_MS);
+    }
+  }
+
+  // Wait for each reel to land and play its stop-tick sound
+  for (let i = 0; i < 5; i++) {
+    const landTime = baseDuration + i * STOP_STAGGER_MS;
+    await new Promise((resolve) => setTimeout(resolve, i === 0 ? landTime : STOP_STAGGER_MS));
+    playStopTickSound();
+    updateReelAriaLabel(i, payline[i]);
+  }
+
+  // Show win feedback after all reels land
+  if (payout > 0) {
+    playWinSound(winTier);
+    applyWinAnimation(winTier, matchCount);
+
+    const message =
+      winTier === 'jackpot'  ? `🏆 CHAMPIONSHIP! +${payout} credits!` :
+      winTier === 'big'      ? `🔥 Big Win! +${payout} credits!` :
+                               `+${payout} credits`;
+
+    showWinMessage(message);
+  }
+
+  updateCreditsDisplay(newCredits);
+  lastWinDisplay.textContent = payout;
+  currentCredits = newCredits;
+}
+
+/**
+ * Handles a spin button press: validates state, calls the API, runs the animation.
+ */
+async function handleSpin() {
+  if (isSpinning) {
+    return;
+  }
+  if (currentCredits < currentBet) {
+    showWinMessage('Not enough credits!');
+    return;
+  }
+
+  isSpinning = true;
+  spinButton.disabled = true;
+  betDecreaseButton.disabled = true;
+  betIncreaseButton.disabled = true;
+  winMessage.classList.remove('visible');
+
+  try {
+    const result = await postSpin(currentBet, currentCredits);
+    await runSpinSequence(
+      result.reels,
+      result.payline,
+      result.payout,
+      result.credits,
+      result.winTier,
+      result.matchCount
+    );
+  } catch (err) {
+    console.error('Spin error:', err);
+    showWinMessage('Connection error — try again.');
+  } finally {
+    isSpinning = false;
+    spinButton.disabled = false;
+    refreshBetDisplay();
+  }
+}
+
+/** Handles bet decrease. */
+function handleBetDecrease() {
+  currentBet = Math.max(MIN_BET, currentBet - BET_STEP);
+  refreshBetDisplay();
+}
+
+/** Handles bet increase. */
+function handleBetIncrease() {
+  currentBet = Math.min(MAX_BET, currentBet + BET_STEP);
+  refreshBetDisplay();
+}
+
+/** Handles mute toggle. */
+function handleMuteToggle() {
+  const isMuted = muteToggle.getAttribute('aria-pressed') === 'true';
+  const nextMuted = !isMuted;
+  muteToggle.setAttribute('aria-pressed', String(nextMuted));
+  muteIcon.textContent = nextMuted ? '🔇' : '🔊';
+  muteToggle.setAttribute('aria-label', nextMuted ? 'Unmute audio' : 'Mute audio');
+
+  import('./audio.js').then(({ setMuted }) => setMuted(nextMuted));
+}
+
+/** Toggles the collapsible paytable open/closed. */
+function handlePaytableToggle() {
+  const isOpen = paytableEl.classList.toggle('paytable--open');
+  paytableToggle.setAttribute('aria-expanded', String(isOpen));
+}
+
+// Wire up event listeners
+spinButton.addEventListener('click', handleSpin);
+betDecreaseButton.addEventListener('click', handleBetDecrease);
+betIncreaseButton.addEventListener('click', handleBetIncrease);
+muteToggle.addEventListener('click', handleMuteToggle);
+paytableToggle.addEventListener('click', handlePaytableToggle);
+
+// 's' key shortcut to spin
+document.addEventListener('keydown', (event) => {
+  if (event.key === 's' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+    const active = document.activeElement;
+    if (active.tagName !== 'INPUT' && active.tagName !== 'TEXTAREA') {
+      handleSpin();
+    }
+  }
+});
+
+// Seed all reels with staggered symbols on first load
+(function initReels() {
+  for (let i = 0; i < 5; i++) {
+    const topId = SYMBOL_IDS[i % SYMBOL_IDS.length];
+    const midId = SYMBOL_IDS[(i + 1) % SYMBOL_IDS.length];
+    const botId = SYMBOL_IDS[(i + 2) % SYMBOL_IDS.length];
+    setupStrip(i, topId, midId, botId);
+  }
+})();
+
+refreshBetDisplay();
+updateCreditsDisplay(currentCredits);

@@ -1,0 +1,210 @@
+@use 'variables' as *;
+
+// Spin button, bet controls, mute toggle, paytable toggle
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-sm;
+}
+
+.spin-button {
+  width: 100%;
+  padding: $space-sm $space-xl;
+  background-color: $color-accent;
+  color: #fff;
+  border: none;
+  border-radius: $radius-pill;
+  font-size: $font-size-xl;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 20px rgb(242 101 34 / 45%);
+  min-height: 52px;
+
+  &:hover:not(:disabled) {
+    background-color: $color-accent-hover;
+    box-shadow: 0 6px 28px rgb(242 101 34 / 65%);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 3px solid $color-gold;
+    outline-offset: 3px;
+  }
+
+  &:disabled {
+    background-color: $color-accent-disabled;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.bet-controls {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+
+  &__button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid $color-surface-raised;
+    background-color: $color-surface;
+    color: $color-text;
+    font-size: $font-size-lg;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover:not(:disabled) {
+      background-color: $color-surface-raised;
+      border-color: $color-accent;
+    }
+
+    &:focus-visible {
+      outline: 3px solid $color-gold;
+      outline-offset: 3px;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  &__label {
+    font-size: $font-size-lg;
+    color: $color-text-muted;
+    min-width: 5.5rem;
+    text-align: center;
+
+    strong {
+      color: $color-text;
+    }
+  }
+}
+
+.mute-toggle {
+  background: transparent;
+  border: 2px solid $color-border;
+  border-radius: $radius-md;
+  padding: $space-xs $space-sm;
+  cursor: pointer;
+  font-size: $font-size-lg;
+  line-height: 1;
+  transition: border-color 0.15s ease;
+  color: $color-text;
+
+  &:hover {
+    border-color: $color-accent;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $color-gold;
+    outline-offset: 3px;
+  }
+
+  &[aria-pressed='true'] {
+    border-color: $color-accent;
+    opacity: 0.6;
+  }
+}
+
+// Collapsible paytable
+.paytable {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  overflow: hidden;
+
+  &__toggle {
+    width: 100%;
+    padding: $space-sm $space-md;
+    background: none;
+    border: none;
+    color: $color-gold;
+    font-size: $font-size-sm;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: $color-surface-raised;
+    }
+
+    &:focus-visible {
+      outline: 3px solid $color-gold;
+      outline-offset: -3px;
+    }
+
+    &__arrow {
+      transition: transform 0.25s ease;
+      font-style: normal;
+
+      .paytable--open & {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  &__body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 $space-md;
+
+    .paytable--open & {
+      max-height: 600px;
+      padding: 0 $space-md $space-md;
+    }
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $font-size-xs;
+
+    th,
+    td {
+      padding: 4px $space-xs;
+      text-align: left;
+      border-bottom: 1px solid $color-border;
+    }
+
+    th {
+      color: $color-text-muted;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:nth-child(even) {
+      background-color: rgb(255 255 255 / 3%);
+    }
+  }
+
+  &__note {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    margin-top: $space-xs;
+    text-align: center;
+  }
+}

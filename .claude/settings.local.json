@@ -26,7 +26,15 @@
       "Bash(node server/server.js)",
       "Bash(git config *)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Read(///wsl.localhost/Ubuntu/root/110/TechWarmUp2-SlotMachine/client/**)",
+      "Read(///wsl.localhost/Ubuntu/root/110/TechWarmUp2-SlotMachine/**)",
+      "Bash(npm test *)",
+      "Bash(git mv *)",
+      "Bash(node *)",
+      "Bash(wsl *)",
+      "Bash(node_modules/.bin/stylelint \"src/client/scss/**/*.scss\")",
+      "Bash(node_modules/.bin/htmlhint src/client/index.html)"
     ]
   }
 }
