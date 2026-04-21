@@ -40,4 +40,4 @@ Built the entire project in one run following the creation order from the plan:
 - Playwright's `webServer` config fails on Windows UNC paths; the server must be started manually before running e2e tests.
 - No hand-editing was required after each fix; all issues were identified via linter output and corrected programmatically.
 
-**Commit Hash:** (to be filled in after commit)
+**Commit Hash:** 1e7161c
