@@ -1,0 +1,44 @@
+// Color tokens
+$color-bg: #1a1a2e;
+$color-surface: #16213e;
+$color-surface-raised: #0f3460;
+$color-accent: #e94560;
+$color-accent-glow: #ff6b8a;
+$color-gold: #ffd700;
+$color-gold-glow: #ffec6e;
+$color-text: #e0e0e0;
+$color-text-muted: #a0a0b0;
+$color-win-small: #4caf50;
+$color-win-big: #ff9800;
+$color-win-jackpot: $color-gold;
+$color-border: #2a2a4e;
+$color-reel-bg: #0d0d1a;
+$color-button-spin: $color-accent;
+$color-button-spin-hover: #c73050;
+$color-button-spin-disabled: #555;
+
+// Typography
+$font-primary: 'Segoe UI', system-ui, -apple-system, sans-serif;
+$font-size-base: 16px;
+$font-size-sm: 0.875rem;
+$font-size-lg: 1.25rem;
+$font-size-xl: 1.5rem;
+$font-size-2xl: 2rem;
+$font-size-reel: clamp(2.5rem, 8vw, 4rem);
+
+// Spacing scale
+$space-xs: 0.25rem;
+$space-sm: 0.5rem;
+$space-md: 1rem;
+$space-lg: 1.5rem;
+$space-xl: 2rem;
+$space-2xl: 3rem;
+
+// Borders and radii
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 16px;
+$radius-pill: 9999px;
+
+// Z-index layers
+$z-flash: 100;

@@ -1,0 +1,13 @@
+{
+  "extends": "stylelint-config-standard-scss",
+  "rules": {
+    "selector-class-pattern": [
+      "^[a-z][a-z0-9-]*(__[a-z][a-z0-9-]*)?(--[a-z][a-z0-9-]*)?$",
+      { "message": "Expected class selector to use BEM naming (block__element--modifier with hyphens allowed)" }
+    ],
+    "no-descending-specificity": null,
+    "property-no-deprecated": [true, { "ignoreProperties": ["clip"] }],
+    "declaration-block-single-line-max-declarations": null,
+    "keyframes-name-pattern": null
+  }
+}

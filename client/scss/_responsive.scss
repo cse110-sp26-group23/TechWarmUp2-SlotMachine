@@ -1,0 +1,43 @@
+@use 'variables' as *;
+
+// Media queries for 500 px, 900 px, 1200 px breakpoints
+
+@media (width >= 500px) {
+  .app {
+    max-width: 480px;
+    padding: $space-lg;
+  }
+
+  .reels {
+    gap: $space-md;
+    padding: $space-lg;
+  }
+
+  .spin-button {
+    font-size: $font-size-2xl;
+  }
+}
+
+@media (width >= 900px) {
+  body {
+    padding: $space-xl;
+  }
+
+  .app {
+    max-width: 600px;
+  }
+
+  .stats__list {
+    gap: $space-2xl;
+  }
+}
+
+@media (width >= 1200px) {
+  .app {
+    max-width: 700px;
+  }
+
+  .paytable__table {
+    font-size: $font-size-lg;
+  }
+}
