@@ -1,4 +1,4 @@
-# Claude Code Prompt: Refinement 1
+# Claude Code Prompt: Refinement 2
 
 You are refining a browser-based slot machine app. Make sure to continue to adhere to `src/ai-plan.md`and `src/slot-prd.md`.
 
@@ -15,5 +15,9 @@ You are refining a browser-based slot machine app. Make sure to continue to adhe
 4. Because this is intended for entertainment, winning should happen a bit more often, even when something isn't a "Big Win" it should still feel like you have won something. Review the odds and implement.
 
 5. Make sure to adhere to Responsive Web Design and have the UI make sense across different screen sizes.
+
+6. Lock in the visual-style: High-saturation (make the colors pop like a real casino game), Glossy/Polished professional feel, Tiered Jackpot System for the top bar.
+
+7. Ensure a organizational seperation between the Background Layer (to be filled in with designer art), the Information Layer (the headers containering levels of prizes), the Action Layer (A 5x3 grid of high-saturation), the Control Layer (the User interface HUD)
 
 Always make sure to check work against ai-plan.md and test.
