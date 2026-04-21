@@ -3,7 +3,30 @@
     "allow": [
       "Read(//mnt/wsl/**)",
       "Read(//c/Users/brend/110/**)",
-      "Read(///wsl.localhost/Ubuntu//**)"
+      "Read(///wsl.localhost/Ubuntu//**)",
+      "Bash(npm --version)",
+      "Read(///wsl.localhost/Ubuntu/root/110/**)",
+      "Bash(npm install *)",
+      "Bash(mkdir -p server/game server/routes client/scss client/css client/js client/audio tests/unit tests/e2e src/ai-use-log)",
+      "Bash(rm src/ai-use-log)",
+      "Bash(node --test tests/unit/paytable.test.js)",
+      "Bash(node --test tests/unit/rng.test.js)",
+      "Bash(node --test tests/unit/game.test.js)",
+      "Bash(node --test tests/unit/simulation.test.js)",
+      "Bash(node --test tests/unit/paytable.test.js tests/unit/rng.test.js tests/unit/game.test.js)",
+      "Bash(node --test tests/unit/spin.route.test.js)",
+      "Bash(node --test tests/unit/paytable.test.js tests/unit/rng.test.js tests/unit/game.test.js tests/unit/simulation.test.js tests/unit/spin.route.test.js)",
+      "Bash(npm run *)",
+      "Bash(./node_modules/.bin/sass client/scss/main.scss client/css/styles.css --style=compressed)",
+      "Bash(./node_modules/.bin/eslint \"server/**/*.js\")",
+      "Bash(./node_modules/.bin/stylelint \"client/scss/**/*.scss\")",
+      "Bash(./node_modules/.bin/htmlhint client/index.html)",
+      "Bash(./node_modules/.bin/playwright install *)",
+      "Bash(./node_modules/.bin/playwright test *)",
+      "Bash(node server/server.js)",
+      "Bash(git config *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
