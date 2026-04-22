@@ -15,13 +15,13 @@ Refinement is where most of the real work happened. Across sessions 2 through 18
 The pattern that worked best was: explore the codebase first, write a plan, then implement. Sessions that jumped straight to implementation tended to introduce bugs that showed up two or three sessions later. The CSP conflict blocking CDN scripts, the missing background music call site, and the DEV_MODE field name mismatch were all examples of that (each introduced in one session, noticed much later).
 
 ## Final State
-By Entry 18 the app had 52 passing unit tests, 11 Playwright end-to-end tests, verified RTP of ~94%, a 5×3 reel grid with scrolling animation, PNG symbol images with emoji fallback, real MP3 sound effects via Howler, GSAP win animations, canvas-confetti on jackpot, a collapsible paytable, a debug force-spin mode, and a scoreboard-style UI with reduced glow. The linters (ESLint, Stylelint, HTMLHint) passed clean at every step.
+?????
 
 ## Main Takeaway
-The biggest thing this project showed is that AI-assisted development is fast at breadth and slow to catch integration mistakes. Scaffolding an entire project in 15 minutes is real. But bugs that cross session boundaries — where a change in one file breaks an assumption in another — tend to slip through because unit tests pass and nothing looks wrong until you actually run the full thing. End-to-end tests and explicit audit sessions are not optional, they're the safety net that makes the whole workflow reliable.
+AI is fast at building things but bad at catching its own mistakes across sessions. Getting a full project scaffolded in 15 minutes is genuinely useful. The problem is that bugs introduced in one session often don't show up until a few sessions later, and by then they're harder to trace. Running the full app end-to-end (not just unit tests) is the only way to actually know things are working.
 
 ## Limitations
-This was one project, one tool, one developer. The workflow that emerged here — plan-heavy, lint-gated, test-first — is not the only way to work with AI coding tools, and it might not generalize to every kind of project. The 18 sessions also represent a fairly high level of prompt discipline; a looser workflow would likely produce messier results.
+This was one project, one tool, one developer. The workflow that emerged here (plan-heavy, lint-gated, test-first) is not the only way to work with AI coding tools, and it might not generalize to every kind of project. The ?? sessions also represent a fairly high level of prompt discipline; a looser workflow would likely produce messier results.
 
 ## Conclusion
 The project shipped. The game math hits its targets, the tests pass, the UI works on mobile, and the code is linted clean. Claude Code got it there faster than manual development would have, but it needed direction, structure, and a human catching the things that looked fine on the surface but weren't. The best mental model for this kind of workflow is not "AI writes the code" but "AI handles the volume while you handle the judgment."
