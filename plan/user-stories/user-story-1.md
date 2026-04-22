@@ -1,9 +1,9 @@
-### Feature 1 — Mute Button
-**As a** player somewhere I need to be quiet,
-**I want** one button to kill all sound,
-**so that** I don't have to fumble around mid-spin.
+### Feature 1 — Symbol Images in Reels and Paytable
+As a player,
+I want to see real icons instead of emojis on the reels and paytable,
+so that the game looks polished and visually intentional.
  
-**Acceptance Criteria:**
-- Mute button is always on screen and obvious
-- Cuts audio instantly, even if something is mid-play
-- Stays muted until I turn it back on
+Acceptance Criteria:
+- PNG images display for each symbol in both the reels and the paytable
+- If an image fails to load, the emoji fallback shows instead
+- Broken image tags are removed from the DOM on error rather than showing a broken icon
