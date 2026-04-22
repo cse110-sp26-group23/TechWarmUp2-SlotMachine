@@ -4,7 +4,7 @@
 This project was about building a browser-based basketball slot machine app from scratch using Claude Code as the primary development tool. The goal was to see how far AI-assisted engineering could take a real full-stack project (not just a toy, but something with server-side game math, a REST API, a tested client, accessibility, and iterative refinement across multiple sessions).
 
 ## Setup
-We used Claude Code with Claude Sonnet medium across 20 logged sessions. Each session started from the current state of the codebase (STRICTLY no hand-editing between runs.) The first session built the entire project from a written spec. Every session after that was either a planned refinement pass or a targeted fix. All generated code was linted and tested before moving on.
+We used Claude Code with Claude Sonnet 4.6 medium model across 20 logged sessions. Each session started from the current state of the codebase (STRICTLY no hand-editing between runs.) The first session built the entire project from a written spec. Every session after that was either a planned refinement pass or a targeted fix. All generated code was linted and tested before moving on.
 
 ## What We Found in the Initial Build
 The first session was the most surprising. The full project (Express server, game math, REST API, HTML/SCSS/JS client, Web Audio, and 35+ unit and e2e tests) came out in 15 minutes. The game math was off on the first attempt (RTP came in around 10% instead of 93%) but the AI caught it through its own simulation test and redesigned the paytable analytically before moving on. No hand-editing was needed. That said, it was clearly a first attempt. The visual design was generic and the audio was all synthesized oscillator tones, not real sound files.
