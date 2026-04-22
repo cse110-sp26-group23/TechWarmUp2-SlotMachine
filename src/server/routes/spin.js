@@ -7,9 +7,19 @@
 'use strict';
 
 import { Router } from 'express';
-import { spin, isValidBet, STARTING_CREDITS, MIN_BET, MAX_BET } from '../game/game.js';
+import { z } from 'zod';
+import { spin, STARTING_CREDITS, MIN_BET, MAX_BET } from '../game/game.js';
 
 const router = Router();
+
+const SpinBodySchema = z.object({
+  bet: z
+    .number({ invalid_type_error: 'bet must be a number' })
+    .int('bet must be an integer')
+    .min(MIN_BET, `bet must be at least ${MIN_BET}`)
+    .max(MAX_BET, `bet must be at most ${MAX_BET}`),
+  credits: z.number().nonnegative().optional().default(STARTING_CREDITS),
+});
 
 /**
  * POST /api/spin
@@ -20,23 +30,15 @@ const router = Router();
  * Returns 400 on invalid input; 500 on unexpected server errors.
  */
 router.post('/spin', (req, res) => {
-  const { bet, credits } = req.body;
-
-  if (typeof bet !== 'number') {
-    return res.status(400).json({ error: 'bet must be a number.' });
+  const parsed = SpinBodySchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.issues[0].message });
   }
 
-  if (!isValidBet(bet)) {
-    return res
-      .status(400)
-      .json({ error: `bet must be an integer between ${MIN_BET} and ${MAX_BET}.` });
-  }
-
-  const currentCredits =
-    typeof credits === 'number' && credits >= 0 ? credits : STARTING_CREDITS;
+  const { bet, credits } = parsed.data;
 
   try {
-    const result = spin(currentCredits, bet);
+    const result = spin(credits, bet);
     return res.json(result);
   } catch (err) {
     if (err instanceof RangeError) {

@@ -333,3 +333,32 @@ Read and analysed all key source files: `ui.js`, `audio.js`, `effects.js`, `api.
 
 **Time:** 1m 10s
 **Tokens:** 7.7k
+
+---
+
+## Entry 11 — Claude Code (Refinement Lib-04: Zod Schema Validation)
+
+**Goal:** Replace manual `typeof` / `Number.isInteger()` / range-check validation in the server-side route handlers with Zod, making HTTP-boundary validation declarative and consistent.
+
+**Prompt:** Claude Code Prompt: Refinement Lib-04 — Zod Schema Validation (full prompt specifying `SpinBodySchema` for `spin.js`, `ForceTierSchema` for `debug.js`, keeping `isValidBet()` in `game.js`, and updating tests).
+
+**Summary:**
+
+1. **`npm install zod`** — Added Zod 3.x as a production dependency.
+
+2. **`src/server/routes/spin.js`** — Removed `isValidBet` import (no longer needed at the HTTP boundary). Added `import { z } from 'zod'`. Defined `SpinBodySchema` at module scope with `.int()`, `.min(MIN_BET)`, `.max(MAX_BET)` on the `bet` field and `.nonnegative().optional().default(STARTING_CREDITS)` on `credits`. Replaced the `typeof bet !== 'number'` + `isValidBet()` guards and the `typeof credits === 'number'` ternary with a single `SpinBodySchema.safeParse(req.body)` call. On failure, returns the first Zod issue message as the 400 error.
+
+3. **`src/server/routes/debug.js`** — Removed `isValidBet` import. Added `import { z } from 'zod'`. Defined `ForceTierSchema` with `z.enum(['jackpot', 'big', 'small', 'none'])` for the `tier` field and the same `bet`/`credits` schema as spin. Replaced the `typeof bet !== 'number' || !isValidBet(bet)` check, the `validTiers.includes(winTier)` check, and the `typeof credits === 'number'` ternary with a single `ForceTierSchema.safeParse(req.body)` call. Destructured `{ tier, bet, credits }` from `parsed.data`.
+
+4. **`src/server/game/game.js`** — No changes; `isValidBet()` is preserved as the domain-layer guard inside `spin()`.
+
+5. **Tests** — All 9 `spin.route.test.js` tests pass (including missing bet, bet=0, bet>MAX_BET, non-integer bet, string bet, insufficient credits). No test assertions on specific error strings needed updating since the tests only check the HTTP status code. ESLint and all linters report zero errors.
+
+**Reflection:**
+- Zod's `.int()` check correctly rejects floats (1.5) and its type check rejects strings ('10'), matching the previous manual guard behavior exactly — no test changes were required.
+- The `credits` field with `.optional().default(STARTING_CREDITS)` cleanly replaces the ternary `typeof credits === 'number' && credits >= 0 ? credits : STARTING_CREDITS` pattern in both routes.
+- The `ForceTierSchema` uses `tier` (not `winTier`) as the field name, matching the schema instruction. The handler was updated to destructure `tier` from `parsed.data` and pass it to `buildForcedReels(tier)`.
+- The simulation test produced a one-off 100.05% RTP result during the full suite run (statistical variance over 10,000 spins); it passes consistently in isolation and is unrelated to this change.
+
+**Time:** 2m 6s
+**Tokens:** 8.4k

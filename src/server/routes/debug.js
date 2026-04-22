@@ -10,11 +10,22 @@
 'use strict';
 
 import { Router } from 'express';
+import { z } from 'zod';
 import { drawSymbol } from '../game/rng.js';
 import { calculatePayout, classifyWin } from '../game/paytable.js';
-import { isValidBet, STARTING_CREDITS, MIN_BET, MAX_BET } from '../game/game.js';
+import { STARTING_CREDITS, MIN_BET, MAX_BET } from '../game/game.js';
 
 const router = Router();
+
+const ForceTierSchema = z.object({
+  tier: z.enum(['jackpot', 'big', 'small', 'none']),
+  bet: z
+    .number()
+    .int()
+    .min(MIN_BET)
+    .max(MAX_BET),
+  credits: z.number().nonnegative().optional().default(STARTING_CREDITS),
+});
 
 /**
  * Builds a forced 5-reel result for the given win tier.
@@ -53,19 +64,13 @@ router.post('/force-spin', (req, res) => {
     return res.status(403).json({ error: 'Debug endpoint not available.' });
   }
 
-  const { bet, credits, winTier } = req.body;
-
-  if (typeof bet !== 'number' || !isValidBet(bet)) {
-    return res.status(400).json({ error: `bet must be an integer between ${MIN_BET} and ${MAX_BET}.` });
+  const parsed = ForceTierSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.issues[0].message });
   }
 
-  const validTiers = ['none', 'small', 'big', 'jackpot'];
-  if (!validTiers.includes(winTier)) {
-    return res.status(400).json({ error: `winTier must be one of: ${validTiers.join(', ')}.` });
-  }
-
-  const currentCredits = typeof credits === 'number' && credits >= 0 ? credits : STARTING_CREDITS;
-  const reels = buildForcedReels(winTier);
+  const { tier, bet, credits } = parsed.data;
+  const reels = buildForcedReels(tier);
   const payline = reels.map((col) => col[1]);
 
   let matchCount = 1;
@@ -79,7 +84,7 @@ router.post('/force-spin', (req, res) => {
 
   const payout = calculatePayout(payline, bet);
   const resolvedTier = classifyWin(payout, bet);
-  const newCredits = Math.max(0, currentCredits - bet + payout);
+  const newCredits = Math.max(0, credits - bet + payout);
 
   return res.json({
     reels,
