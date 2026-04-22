@@ -12,7 +12,7 @@
 .spin-button {
   width: 100%;
   padding: $space-sm $space-xl;
-  background-color: $color-accent;
+  background: linear-gradient(180deg, #ff8040 0%, $color-accent 50%, #e05a10 100%);
   color: #fff;
   border: none;
   border-radius: $radius-pill;
@@ -21,13 +21,13 @@
   letter-spacing: 0.12em;
   cursor: pointer;
   text-transform: uppercase;
-  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 20px rgb(242 101 34 / 45%);
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 20px rgb(255 107 26 / 55%), inset 0 1px 0 rgb(255 255 255 / 20%);
   min-height: 52px;
 
   &:hover:not(:disabled) {
-    background-color: $color-accent-hover;
-    box-shadow: 0 6px 28px rgb(242 101 34 / 65%);
+    background: linear-gradient(180deg, #ff9050 0%, #ff7030 50%, #c84808 100%);
+    box-shadow: 0 6px 28px rgb(255 107 26 / 75%), inset 0 1px 0 rgb(255 255 255 / 20%);
   }
 
   &:active:not(:disabled) {
@@ -52,8 +52,8 @@
   gap: $space-md;
 
   &__button {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 2px solid $color-surface-raised;
     background-color: $color-surface;

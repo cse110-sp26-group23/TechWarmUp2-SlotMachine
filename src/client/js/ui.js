@@ -4,9 +4,9 @@
  * @part-of CSE 110 Tech Warm-Up 2
  */
 
-import { postSpin } from './api.js';
+import { postSpin, postForceSpin } from './api.js';
 import { playSpinSound, playStopTickSound, playWinSound } from './audio.js';
-import { spawnConfetti, addScreenFlash } from './effects.js';
+import { spawnConfetti, addScreenFlash, spawnBouncingBalls, spawnLightBursts, showSlamText } from './effects.js';
 
 // Basketball symbol emoji map — mirrors server paytable IDs
 const SYMBOL_EMOJI = {
@@ -61,6 +61,11 @@ const muteToggle = document.getElementById('muteToggle');
 const muteIcon = muteToggle.querySelector('.mute-toggle__icon');
 const paytableEl = document.getElementById('paytable');
 const paytableToggle = document.getElementById('paytableToggle');
+const debugButton = document.getElementById('debugButton');
+const debugModal = document.getElementById('debugModal');
+const debugModalClose = document.getElementById('debugModalClose');
+const debugTriggers = document.querySelectorAll('.debug-modal__trigger');
+const tierGrandEl = document.getElementById('tierGrand');
 
 /**
  * Reads the --reel-cell-height CSS custom property set by the SCSS responsive rules.
@@ -155,7 +160,23 @@ function updateReelAriaLabel(reelIndex, symbolId) {
 }
 
 /**
- * Applies win-tier visual classes to the winning reels (consecutive from left).
+ * Pulses the GRAND jackpot tier indicator then removes the active class.
+ */
+function animateJackpotTier() {
+  if (!tierGrandEl) {
+    return;
+  }
+  tierGrandEl.classList.remove('jackpot-tier--active');
+  void tierGrandEl.offsetWidth;
+  tierGrandEl.classList.add('jackpot-tier--active');
+  tierGrandEl.addEventListener('animationend', () => {
+    tierGrandEl.classList.remove('jackpot-tier--active');
+  }, { once: true });
+}
+
+/**
+ * Applies win-tier visual classes to the winning reels (consecutive from left)
+ * and triggers matching celebratory effects.
  * @param {string} winTier - 'none' | 'small' | 'big' | 'jackpot'.
  * @param {number} matchCount - Number of reels from the left that matched.
  */
@@ -172,9 +193,18 @@ function applyWinAnimation(winTier, matchCount) {
 
   if (winTier === 'big' || winTier === 'jackpot') {
     addScreenFlash();
+    spawnLightBursts();
+    spawnBouncingBalls(winTier === 'jackpot' ? 8 : 3);
+    showSlamText(winTier);
   }
+
+  if (winTier === 'small') {
+    showSlamText('small');
+  }
+
   if (winTier === 'jackpot') {
     spawnConfetti();
+    animateJackpotTier();
   }
 }
 
@@ -268,12 +298,13 @@ async function runSpinSequence(reels, payline, payout, newCredits, winTier, matc
     playWinSound(winTier);
     applyWinAnimation(winTier, matchCount);
 
-    const message =
-      winTier === 'jackpot'  ? `🏆 CHAMPIONSHIP! +${payout} credits!` :
-      winTier === 'big'      ? `🔥 Big Win! +${payout} credits!` :
-                               `+${payout} credits`;
-
-    showWinMessage(message);
+    const SLAM_MESSAGES = {
+      jackpot: ['🏆 CHAMPIONSHIP!', '🏀 BUZZER BEATER!', 'NOTHING BUT NET!'],
+      big:     ['🔥 FROM DOWNTOWN!', '💪 AND ONE!', '🔥 BIG WIN!'],
+    };
+    const msgPool = SLAM_MESSAGES[winTier];
+    const header = msgPool ? msgPool[Math.floor(Math.random() * msgPool.length)] : '';
+    showWinMessage(header ? `${header} +${payout} credits!` : `+${payout} credits`);
   }
 
   updateCreditsDisplay(newCredits);
@@ -348,6 +379,86 @@ function handlePaytableToggle() {
   paytableToggle.setAttribute('aria-expanded', String(isOpen));
 }
 
+/**
+ * Runs a forced spin for the given win tier (debug mode only).
+ * Mirrors handleSpin() but calls postForceSpin instead of postSpin.
+ * @param {'none'|'small'|'big'|'jackpot'} winTier - The desired outcome.
+ */
+async function handleDebugSpin(winTier) {
+  if (isSpinning) {
+    return;
+  }
+
+  isSpinning = true;
+  spinButton.disabled = true;
+  betDecreaseButton.disabled = true;
+  betIncreaseButton.disabled = true;
+  winMessage.classList.remove('visible');
+
+  try {
+    const result = await postForceSpin(currentBet, currentCredits, winTier);
+    await runSpinSequence(
+      result.reels,
+      result.payline,
+      result.payout,
+      result.credits,
+      result.winTier,
+      result.matchCount
+    );
+  } catch (err) {
+    console.error('Debug spin error:', err);
+    showWinMessage('Debug spin failed — is DEV_MODE active?');
+  } finally {
+    isSpinning = false;
+    spinButton.disabled = false;
+    refreshBetDisplay();
+  }
+}
+
+/**
+ * Initialises the debug UI if window.DEV_MODE is set.
+ * No-ops in production builds.
+ */
+function initDevMode() {
+  if (!window.DEV_MODE) {
+    return;
+  }
+
+  debugButton.removeAttribute('hidden');
+
+  function openModal() {
+    debugModal.removeAttribute('hidden');
+    debugModal.querySelector('.debug-modal__panel').focus();
+  }
+
+  function closeModal() {
+    debugModal.setAttribute('hidden', '');
+    debugButton.focus();
+  }
+
+  debugButton.addEventListener('click', openModal);
+  debugModalClose.addEventListener('click', closeModal);
+
+  debugModal.addEventListener('click', (event) => {
+    if (event.target === debugModal) {
+      closeModal();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !debugModal.hasAttribute('hidden')) {
+      closeModal();
+    }
+  });
+
+  debugTriggers.forEach((trigger) => {
+    trigger.addEventListener('click', () => {
+      closeModal();
+      handleDebugSpin(trigger.dataset.tier);
+    });
+  });
+}
+
 // Wire up event listeners
 spinButton.addEventListener('click', handleSpin);
 betDecreaseButton.addEventListener('click', handleBetDecrease);
@@ -377,3 +488,4 @@ document.addEventListener('keydown', (event) => {
 
 refreshBetDisplay();
 updateCreditsDisplay(currentCredits);
+initDevMode();

@@ -33,7 +33,7 @@ describe('simulation', () => {
     assert.ok(rtp <= 0.98, `RTP ${(rtp * 100).toFixed(2)}% is above the 98% ceiling`);
   });
 
-  it('hit frequency is within the 20–35% target range', () => {
+  it('hit frequency is within the 25–40% target range', () => {
     let hits = 0;
     let credits = CREDITS_POOL;
 
@@ -48,8 +48,8 @@ describe('simulation', () => {
     const hitFreq = hits / SPIN_COUNT;
     console.log(`Hit frequency: ${(hitFreq * 100).toFixed(2)}%`);
 
-    assert.ok(hitFreq >= 0.18, `Hit freq ${(hitFreq * 100).toFixed(2)}% is below the 18% floor`);
-    assert.ok(hitFreq <= 0.38, `Hit freq ${(hitFreq * 100).toFixed(2)}% exceeds the 38% ceiling`);
+    assert.ok(hitFreq >= 0.25, `Hit freq ${(hitFreq * 100).toFixed(2)}% is below the 25% floor`);
+    assert.ok(hitFreq <= 0.40, `Hit freq ${(hitFreq * 100).toFixed(2)}% exceeds the 40% ceiling`);
   });
 
   it('every basketball symbol appears across all reels and rows', () => {

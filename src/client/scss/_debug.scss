@@ -1,0 +1,131 @@
+@use 'variables' as *;
+
+// Debug panel styles — isolated here for easy removal in production.
+
+.debug-button {
+  position: fixed;
+  bottom: $space-md;
+  right: $space-md;
+  background-color: #d32f2f;
+  color: #fff;
+  border: none;
+  border-radius: $radius-md;
+  padding: $space-xs $space-sm;
+  font-size: $font-size-sm;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  z-index: $z-overlay-debug;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #b71c1c;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $color-gold;
+    outline-offset: 3px;
+  }
+}
+
+.debug-modal {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 75%);
+  z-index: $z-overlay-debug;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &[hidden] {
+    display: none;
+  }
+
+  &__panel {
+    background-color: $color-surface;
+    border: 1px solid $color-surface-glass-border;
+    border-radius: $radius-lg;
+    padding: $space-lg;
+    width: min(360px, 90vw);
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+    position: relative;
+  }
+
+  &__title {
+    font-size: $font-size-lg;
+    font-weight: bold;
+    color: $color-text;
+    margin: 0;
+  }
+
+  &__close {
+    position: absolute;
+    top: $space-sm;
+    right: $space-sm;
+    background: transparent;
+    border: none;
+    color: $color-text-muted;
+    font-size: $font-size-lg;
+    cursor: pointer;
+    line-height: 1;
+    padding: $space-xs;
+    border-radius: $radius-sm;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: $color-text;
+    }
+
+    &:focus-visible {
+      outline: 3px solid $color-gold;
+      outline-offset: 2px;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+  }
+
+  &__trigger {
+    width: 100%;
+    padding: $space-sm $space-md;
+    border: 1px solid $color-surface-glass-border;
+    border-radius: $radius-md;
+    background-color: $color-surface-raised;
+    color: $color-text;
+    font-size: $font-size-sm;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      background-color: $color-blue;
+      border-color: $color-accent;
+    }
+
+    &:focus-visible {
+      outline: 3px solid $color-gold;
+      outline-offset: 2px;
+    }
+
+    &[data-tier='jackpot'] {
+      border-color: $color-tier-grand;
+      color: $color-tier-grand;
+    }
+
+    &[data-tier='big'] {
+      border-color: $color-tier-major;
+      color: $color-tier-major;
+    }
+
+    &[data-tier='small'] {
+      border-color: $color-tier-mini;
+      color: $color-tier-mini;
+    }
+  }
+}

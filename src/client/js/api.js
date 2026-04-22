@@ -29,4 +29,28 @@ async function postSpin(bet, credits) {
   return response.json();
 }
 
-export { postSpin };
+/**
+ * Sends a forced-spin request to the debug endpoint.
+ * Only works when the server is running in DEV_MODE.
+ * @param {number} bet - The wager amount in credits.
+ * @param {number} credits - The player's current credit balance.
+ * @param {'none'|'small'|'big'|'jackpot'} winTier - The desired outcome tier.
+ * @returns {Promise<{ reels: string[][], payout: number, credits: number, winTier: string, matchCount: number }>}
+ * @throws {Error} If the network request fails or the server returns a non-ok status.
+ */
+async function postForceSpin(bet, credits, winTier) {
+  const response = await fetch(`${API_BASE}/api/debug/force-spin`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ bet, credits, winTier }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    throw new Error(errorBody.error ?? `Server error: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export { postSpin, postForceSpin };

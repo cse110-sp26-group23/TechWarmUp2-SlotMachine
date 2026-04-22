@@ -124,8 +124,9 @@ test.describe('Slot Machine', () => {
     expect(bodyScrollWidth).toBeLessThanOrEqual(1460);
   });
 
-  test('paytable is visible on page', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /paytable/i })).toBeVisible();
-    await expect(page.getByRole('cell', { name: /diamond/i })).toBeVisible();
+  test('paytable is visible on page and contains basketball symbol', async ({ page }) => {
+    const paytableToggle = page.locator('#paytableToggle');
+    await paytableToggle.click();
+    await expect(page.getByRole('cell', { name: /basketball/i })).toBeVisible();
   });
 });

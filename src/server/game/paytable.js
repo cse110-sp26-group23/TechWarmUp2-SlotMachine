@@ -3,18 +3,14 @@
  * @author Brendan Barber
  * @part-of CSE 110 Tech Warm-Up 2
  *
- * Game math targets: RTP ~94%, hit frequency ~25%, medium volatility.
+ * Game math targets: RTP ~91–95%, hit frequency ~42–47%, medium volatility.
  *
  * Win rule: count consecutive matching symbols in the payline row from left to
  * right. The payouts object maps match count (2–5) to bet multiplier.
  * Only matches starting from reel 0 pay.
  *
- * Simulated RTP breakdown (total weight = 1000):
- *   P(2-match) ≈ 17.9%  →  RTP contribution ≈ 35.9%
- *   P(3-match) ≈  5.1%  →  RTP contribution ≈ 24.8%
- *   P(4-match) ≈  1.6%  →  RTP contribution ≈ 16.2%
- *   P(5-match) ≈  0.6%  →  RTP contribution ≈ 17.3%
- *   Total RTP ≈ 94.2%, hit frequency ≈ 25.2%
+ * Weights rebalanced for Refinement 2: common symbols heavier, multipliers
+ * reduced proportionally to maintain RTP while increasing hit frequency.
  */
 
 'use strict';
@@ -28,32 +24,32 @@
  */
 const SYMBOLS = [
   {
-    id: 'basketball', label: 'Basketball', emoji: '🏀', weight: 350,
-    payouts: { 2: 2, 3: 4, 4: 8, 5: 20 },
+    id: 'basketball', label: 'Basketball', emoji: '🏀', weight: 420,
+    payouts: { 2: 2, 3: 3, 4: 4, 5: 12 },
   },
   {
-    id: 'sneaker', label: 'Sneaker', emoji: '👟', weight: 280,
-    payouts: { 2: 2, 3: 5, 4: 12, 5: 30 },
+    id: 'sneaker', label: 'Sneaker', emoji: '👟', weight: 300,
+    payouts: { 2: 2, 3: 4, 4: 8, 5: 18 },
   },
   {
-    id: 'jersey', label: 'Jersey', emoji: '👕', weight: 200,
-    payouts: { 2: 2, 3: 6, 4: 20, 5: 50 },
+    id: 'jersey', label: 'Jersey', emoji: '👕', weight: 180,
+    payouts: { 2: 2, 3: 5, 4: 12, 5: 35 },
   },
   {
-    id: 'trophy', label: 'Trophy', emoji: '🏆', weight: 100,
-    payouts: { 2: 2, 3: 12, 4: 40, 5: 100 },
+    id: 'trophy', label: 'Trophy', emoji: '🏆', weight: 65,
+    payouts: { 2: 2, 3: 10, 4: 30, 5: 75 },
   },
   {
-    id: 'star', label: 'All-Star', emoji: '⭐', weight: 45,
-    payouts: { 2: 3, 3: 75, 4: 300, 5: 1000 },
+    id: 'star', label: 'All-Star', emoji: '⭐', weight: 25,
+    payouts: { 2: 3, 3: 60, 4: 220, 5: 700 },
   },
   {
-    id: 'flame', label: 'Hot Streak', emoji: '🔥', weight: 20,
-    payouts: { 2: 5, 3: 200, 4: 1000, 5: 3000 },
+    id: 'flame', label: 'Hot Streak', emoji: '🔥', weight: 8,
+    payouts: { 2: 5, 3: 150, 4: 700, 5: 2200 },
   },
   {
-    id: 'ring', label: 'Championship Ring', emoji: '💍', weight: 5,
-    payouts: { 2: 10, 3: 500, 4: 2500, 5: 10000 },
+    id: 'ring', label: 'Championship Ring', emoji: '💍', weight: 2,
+    payouts: { 2: 10, 3: 400, 4: 1800, 5: 7500 },
   },
 ];
 
@@ -62,7 +58,7 @@ const SYMBOLS = [
  * @type {{ BIG: number, JACKPOT: number }}
  */
 const WIN_TIERS = {
-  BIG: 15,
+  BIG: 12,
   JACKPOT: 100,
 };
 

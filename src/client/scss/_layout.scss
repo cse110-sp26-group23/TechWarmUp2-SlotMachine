@@ -21,9 +21,6 @@ html {
 
 body {
   background-color: $color-bg;
-  background-image: url('../assets/images/bg-arena.svg');
-  background-size: cover;
-  background-position: center;
   color: $color-text;
   font-family: $font-primary;
   min-height: 100vh;
@@ -31,6 +28,47 @@ body {
   flex-direction: column;
   align-items: center;
   padding: $space-sm;
+}
+
+// Layer architecture — 4 explicit z-index layers
+.layer {
+  width: 100%;
+
+  &--background {
+    position: fixed;
+    inset: 0;
+    z-index: $z-layer-background;
+    pointer-events: none;
+    background-image: url('../assets/images/bg-arena.svg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  &--information {
+    position: relative;
+    z-index: $z-layer-information;
+  }
+
+  &--action {
+    position: relative;
+    z-index: $z-layer-action;
+  }
+
+  &--control {
+    position: relative;
+    z-index: $z-layer-control;
+  }
+}
+
+// Centered max-width wrapper replacing .app centering
+.layer__inner {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 $space-sm;
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
 }
 
 .app {
@@ -46,7 +84,10 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: $space-xs $space-sm;
+    background: linear-gradient(180deg, rgb(255 107 26 / 8%) 0%, transparent 100%);
+    border: 1px solid $color-surface-glass-border;
     border-bottom: 2px solid $color-accent;
+    border-radius: $radius-md $radius-md 0 0;
   }
 
   &__title {
@@ -55,17 +96,69 @@ body {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     font-weight: 900;
-    text-shadow: 0 0 12px rgb(242 101 34 / 50%);
+    text-shadow: 0 0 12px rgb(255 107 26 / 60%);
   }
+}
+
+// Jackpot tier bar
+.jackpot-tiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-xs;
+  padding: $space-xs 0;
+}
+
+.jackpot-tier {
+  flex: 1 1 40%;
+  text-align: center;
+  padding: $space-xs $space-sm;
+  border-radius: $radius-sm;
+  border: 1px solid $color-surface-glass-border;
+  background: $color-surface-glass;
+  backdrop-filter: blur(4px);
+  font-size: $font-size-xs;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
+
+  &__label {
+    display: block;
+    opacity: 0.7;
+  }
+
+  &__value {
+    display: block;
+    font-size: $font-size-sm;
+  }
+
+  &--mini  { color: $color-tier-mini;  border-color: rgb(76 175 80 / 30%); }
+  &--major { color: $color-tier-major; border-color: rgb(242 101 34 / 30%); }
+  &--mega  { color: $color-tier-mega;  border-color: rgb(29 66 138 / 50%); }
+
+  &--grand {
+    color: $color-tier-grand;
+    border-color: rgb(255 204 0 / 40%);
+    box-shadow: 0 0 12px rgb(255 204 0 / 30%), inset 0 1px 0 rgb(255 255 255 / 6%);
+
+    &.jackpot-tier--active {
+      animation: jackpot-tier-pulse 0.6s ease-in-out 4;
+    }
+  }
+}
+
+@media (width >= 500px) {
+  .jackpot-tier { flex: 1 1 auto; }
 }
 
 .stats {
   display: flex;
   justify-content: space-around;
-  background-color: $color-surface;
-  border: 1px solid $color-border;
+  background: linear-gradient(180deg, $color-surface-raised 0%, $color-surface 100%);
+  border: 1px solid $color-surface-glass-border;
   border-radius: $radius-md;
   padding: $space-xs $space-sm;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
 
   &__item {
     text-align: center;

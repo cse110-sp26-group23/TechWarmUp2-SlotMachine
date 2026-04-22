@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node src/server/server.js",
     "dev": "nodemon src/server/server.js",
+    "dev:debug": "DEV_MODE=true nodemon src/server/server.js",
     "build:css": "sass src/client/scss/main.scss src/client/css/styles.css --style=compressed",
     "watch:css": "sass --watch src/client/scss/main.scss:src/client/css/styles.css",
     "lint:js": "eslint \"src/client/js/**/*.js\" \"src/server/**/*.js\"",

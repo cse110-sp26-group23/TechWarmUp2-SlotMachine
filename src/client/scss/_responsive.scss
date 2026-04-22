@@ -1,6 +1,7 @@
 @use 'variables' as *;
 
-// Breakpoints: 500 px (larger phones), 900 px (tablets), 1200 px (desktops)
+// Breakpoints: 500 px (larger phones), 768 px (tablet portrait),
+// 900 px (tablets landscape), 1024 px (laptops), 1200 px (desktops)
 
 @media (width >= 500px) {
   :root {
@@ -21,6 +22,29 @@
   }
 }
 
+@media (width >= 768px) {
+  :root {
+    --reel-cell-height: 100px;
+  }
+
+  .layer__inner {
+    max-width: 640px;
+  }
+
+  .jackpot-tier {
+    min-width: 5.5rem;
+  }
+
+  .jackpot-tiers {
+    gap: $space-md;
+  }
+
+  .spin-button {
+    min-height: 64px;
+    font-size: $font-size-xl;
+  }
+}
+
 @media (width >= 900px) {
   :root {
     --reel-cell-height: 115px;
@@ -37,6 +61,16 @@
 
   .stats__item {
     gap: $space-2xl;
+  }
+}
+
+@media (width >= 1024px) {
+  :root {
+    --reel-cell-height: 120px;
+  }
+
+  .layer__inner {
+    max-width: 780px;
   }
 }
 

@@ -2,20 +2,31 @@
 $color-bg: #0a0e1a;
 $color-surface: #141b2d;
 $color-surface-raised: #1e2d4a;
-$color-accent: #f26522;         // NBA orange
-$color-accent-hover: #d4551a;
+$color-accent: #ff6b1a;         // high-saturation NBA orange
+$color-accent-hover: #e05a10;
 $color-accent-disabled: #555;
 $color-blue: #1d428a;           // NBA blue
-$color-gold: #ffd700;
+$color-blue-electric: #1565ff;
+$color-gold: #fc0;           // brighter gold
 $color-gold-glow: #ffec6e;
 $color-text: #f0ede8;
 $color-text-muted: #8a95aa;
 $color-win-small: #4caf50;
-$color-win-big: #f26522;
+$color-win-big: #ff6b1a;
 $color-win-jackpot: $color-gold;
 $color-border: #1e2d4a;
 $color-reel-bg: #060a12;
 $color-payline: $color-accent;
+
+// Glossy surface tokens
+$color-surface-glass: rgb(255 255 255 / 6%);
+$color-surface-glass-border: rgb(255 255 255 / 12%);
+
+// Jackpot tier colors
+$color-tier-mini: #4caf50;
+$color-tier-major: #f26522;
+$color-tier-mega: #1d428a;
+$color-tier-grand: #fc0;
 
 // Typography
 $font-primary: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -48,3 +59,8 @@ $radius-pill: 9999px;
 $z-payline: 2;
 $z-flash: 100;
 $z-particles: 50;
+$z-layer-background: 0;
+$z-layer-information: 10;
+$z-layer-action: 20;
+$z-layer-control: 30;
+$z-overlay-debug: 200;

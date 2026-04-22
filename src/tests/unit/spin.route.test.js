@@ -12,8 +12,8 @@ import { STARTING_CREDITS, MIN_BET, MAX_BET, REEL_COUNT } from '../../server/gam
 let server;
 let baseUrl;
 
-before(() => {
-  server = startServer();
+before(async () => {
+  server = await startServer(0);
   const address = server.address();
   baseUrl = `http://localhost:${address.port}`;
 });
