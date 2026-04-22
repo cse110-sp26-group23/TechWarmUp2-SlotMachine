@@ -271,3 +271,32 @@ Read and analysed all key source files: `ui.js`, `audio.js`, `effects.js`, `api.
 
 **Time:** 5m 40s
 **Tokens:** 23.9k
+
+---
+
+## Entry 9 — Claude Code (Refinement Lib-02: canvas-confetti)
+
+**Goal:** Replace the manual DOM-based confetti particle system in `effects.js` with canvas-confetti — a GPU-accelerated, MIT-licensed library that handles canvas creation, particle physics, gravity, rotation, fading, and DOM cleanup automatically.
+
+**Prompt:** Claude Code Prompt: Refinement Lib-02 — canvas-confetti (full prompt specifying CDN loading, two-cannon + center-burst implementation, and removal of old particle infrastructure).
+
+**Summary:**
+
+1. **`src/client/index.html`** — Added canvas-confetti CDN script tag (`canvas-confetti@1/dist/confetti.browser.min.js`) alongside the GSAP tag so the global `confetti` function is available before the ES module scripts run.
+
+2. **`eslint.config.js`** — Added `confetti: 'readonly'` to the ESLint globals list to satisfy `no-undef` for the CDN-loaded global.
+
+3. **`src/client/js/effects.js`** — Replaced the 25-line `setTimeout` loop that spawned 60 `<div>` particles with a 3-burst `confetti()` call: left cannon (angle 60°, origin x:0), right cannon (angle 120°, origin x:1), and a delayed center burst (angle 90°, spread 120°, 60 particles at 400 ms). Removed `CONFETTI_COLORS` and `CONFETTI_COUNT` constants. Updated fileoverview comment to reflect the new library dependency.
+
+4. **`src/client/scss/_animations.scss`** — Removed `@keyframes particle-fall` and the `.particle` CSS rule (14 lines total). `#particlesContainer` and its other consumers (`spawnBouncingBalls`, `spawnLightBursts`) are unaffected.
+
+**Reflection:**
+- The CDN approach was chosen over `npm install canvas-confetti` because the project has no bundler; all third-party JS is loaded via CDN tags matching the GSAP pattern already in `index.html`.
+- `#particlesContainer` was retained in `index.html` since `spawnBouncingBalls()` and `spawnLightBursts()` still use it — only the confetti-specific CSS was removed.
+- A spurious unit test failure (`uses STARTING_CREDITS when credits is not provided`) appeared on the first post-stash run due to a port conflict from running `npm run test:unit` twice in rapid succession while stashing/popping. The test passes consistently on clean runs; confirmed pre-existing and unrelated to these changes.
+- All 52 unit tests pass and all three linters (ESLint, Stylelint, HTMLHint) report zero errors.
+
+**Commit Hash:** TBD
+
+**Time:** 3m 4s
+**Tokens:** 7.7k

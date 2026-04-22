@@ -27,6 +27,7 @@ export default [
         setInterval: 'readonly',
         clearInterval: 'readonly',
         gsap: 'readonly',
+        confetti: 'readonly',
       },
     },
   },
