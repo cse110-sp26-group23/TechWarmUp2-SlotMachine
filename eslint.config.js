@@ -28,6 +28,8 @@ export default [
         clearInterval: 'readonly',
         gsap: 'readonly',
         confetti: 'readonly',
+        Howl: 'readonly',
+        Howler: 'readonly',
       },
     },
   },

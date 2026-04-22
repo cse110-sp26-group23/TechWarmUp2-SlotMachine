@@ -300,3 +300,36 @@ Read and analysed all key source files: `ui.js`, `audio.js`, `effects.js`, `api.
 
 **Time:** 3m 4s
 **Tokens:** 7.7k
+
+---
+
+## Entry 10 — Claude Code (Refinement Lib-03: Howler.js Audio)
+
+**Goal:** Replace the manual Web Audio API boilerplate and disconnected `<audio>` element background music in `audio.js` with Howler.js, so that all audio — background music and synthesized tones — shares one `AudioContext` and responds to a single global mute call.
+
+**Prompt:** Claude Code Prompt: Refinement Lib-03 — Howler.js Audio (full prompt specifying Howl instance for bg music, Howler.ctx for synthesized tones, Howler.mute() for global mute, removal of isMuted variable and per-function guards, and bgMusicEl cleanup).
+
+**Summary:**
+
+1. **`src/client/index.html`** — Added Howler.js CDN script tag (`howler@2/dist/howler.min.js`) before the GSAP and canvas-confetti tags so the `Howl` and `Howler` globals are available to `audio.js`.
+
+2. **`eslint.config.js`** — Added `Howl: 'readonly'` and `Howler: 'readonly'` to the ESLint globals list to suppress `no-undef` errors for the CDN-loaded globals.
+
+3. **`src/client/js/audio.js`** — Full rewrite:
+   - Removed `bgMusicEl` module variable and the `new Audio(...)` / `el.play().then(...).catch(...)` pattern.
+   - Added a module-level `bgMusic = new Howl({ src: [...], loop: true, volume: 0.12, html5: true })` instance with a `loaderror` handler that silently ignores a missing file.
+   - Updated `getAudioContext()` to return `Howler.ctx` instead of creating an independent `new AudioContext()`. This ensures Howler's autoplay-unlock mechanism covers the synthesized oscillator sounds.
+   - Removed `isMuted` module variable and all `if (isMuted) return;` guards from `playSpinSound()`, `playStopTickSound()`, and `playWinSound()`. Added `if (!ctx) return;` null-guards instead (Howler.ctx is null before first user gesture).
+   - Updated `startBackgroundMusic()` to check `Howler._muted || bgMusic.playing()` before calling `bgMusic.play()`.
+   - Updated `stopBackgroundMusic()` to call `bgMusic.stop()`.
+   - Updated `setMuted(muted)` to call `Howler.mute(muted)` (silences all Howl instances globally) and restart music on unmute.
+   - Updated `getMuted()` to return `Howler._muted`.
+
+**Reflection:**
+- `Howler.ctx` is `null` until the first user gesture triggers Howler's autoplay unlock (or until a Howl plays). Adding `if (!ctx) return;` guards in the tone functions prevents a null-dereference on early calls, matching the original behaviour where `isMuted` would block sounds before any user interaction.
+- The `html5: true` option on `bgMusic` makes Howler stream the file progressively rather than decoding the entire MP3 into memory — important for long background music tracks.
+- Oscillator-based synthesis was preserved unchanged; only the AudioContext source and mute path changed.
+- All 52 unit tests pass; all three linters (ESLint, Stylelint, HTMLHint) report zero errors.
+
+**Time:** 1m 10s
+**Tokens:** 7.7k

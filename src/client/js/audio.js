@@ -3,37 +3,34 @@
  * @author Brendan Barber
  * @part-of CSE 110 Tech Warm-Up 2
  *
- * All game sounds are synthesized via Web Audio API.
- * Background music is reserved for an audio file at assets/audio/bg-music.mp3
- * (place the file there to enable it; the system handles missing files gracefully).
+ * Background music is managed by a Howler.js Howl instance (streams bg-music.mp3).
+ * Sound effects remain oscillator-based synthesis via Howler's shared AudioContext.
+ * Global mute is handled by Howler.mute() which silences all Howl instances at once.
  */
 
-/** @type {AudioContext|null} */
-let audioContext = null;
+/** Background music Howl — streams instead of decoding the full file upfront. */
+const bgMusic = new Howl({
+  src: ['assets/audio/bg-music.mp3', 'assets/audio/bg-music.ogg'],
+  loop: true,
+  volume: 0.12,
+  html5: true,
+});
 
-/** @type {boolean} */
-let isMuted = false;
-
-/** @type {HTMLAudioElement|null} */
-let bgMusicEl = null;
+bgMusic.on('loaderror', () => {
+  // File not available yet — silently ignore
+});
 
 /**
- * Lazily creates and resumes the shared AudioContext.
- * Must be called from a user-gesture handler (browser autoplay policy).
+ * Returns Howler's shared AudioContext, creating it lazily via Howler's
+ * autoplay-unlock mechanism so synthesized tones benefit from the same unlock flow.
  * @returns {AudioContext}
  */
 function getAudioContext() {
-  if (!audioContext) {
-    audioContext = new AudioContext();
-  }
-  if (audioContext.state === 'suspended') {
-    audioContext.resume();
-  }
-  return audioContext;
+  return Howler.ctx;
 }
 
 /**
- * Generates a short synthesized tone.
+ * Generates a short synthesized tone through the shared AudioContext.
  * @param {AudioContext} ctx
  * @param {number} frequency - Hz.
  * @param {number} duration - Seconds.
@@ -55,20 +52,16 @@ function playTone(ctx, frequency, duration, volume = 0.3) {
 
 /** Plays the spin start sound (rising two-note sweep). */
 function playSpinSound() {
-  if (isMuted) {
-    return;
-  }
   const ctx = getAudioContext();
+  if (!ctx) return;
   playTone(ctx, 280, 0.1, 0.18);
   setTimeout(() => playTone(ctx, 420, 0.12, 0.15), 80);
 }
 
 /** Plays the per-reel stop tick. */
 function playStopTickSound() {
-  if (isMuted) {
-    return;
-  }
   const ctx = getAudioContext();
+  if (!ctx) return;
   playTone(ctx, 580, 0.07, 0.22);
 }
 
@@ -77,10 +70,9 @@ function playStopTickSound() {
  * @param {'none'|'small'|'big'|'jackpot'} winTier
  */
 function playWinSound(winTier) {
-  if (isMuted || winTier === 'none') {
-    return;
-  }
+  if (winTier === 'none') return;
   const ctx = getAudioContext();
+  if (!ctx) return;
 
   if (winTier === 'small') {
     playTone(ctx, 523, 0.14, 0.28);
@@ -97,52 +89,34 @@ function playWinSound(winTier) {
 }
 
 /**
- * Starts background music from assets/audio/bg-music.mp3 at low volume.
- * No-op if the file is missing or audio is muted.
+ * Starts background music. No-op if already playing or globally muted.
  */
 function startBackgroundMusic() {
-  if (isMuted || bgMusicEl) {
-    return;
-  }
-  const el = new Audio('assets/audio/bg-music.mp3');
-  el.loop = true;
-  el.volume = 0.12;
-
-  el.play().then(() => {
-    bgMusicEl = el;
-  }).catch(() => {
-    // File not present yet — silently ignore
-  });
+  if (Howler._muted || bgMusic.playing()) return;
+  bgMusic.play();
 }
 
-/** Stops and unloads background music immediately. */
+/** Stops background music immediately. */
 function stopBackgroundMusic() {
-  if (bgMusicEl) {
-    bgMusicEl.pause();
-    bgMusicEl.src = '';
-    bgMusicEl = null;
-  }
+  bgMusic.stop();
 }
 
 /**
- * Sets the global mute state.
+ * Sets the global mute state via Howler, which silences all Howl instances and
+ * the synthesized oscillator sounds simultaneously.
  * @param {boolean} muted
  */
 function setMuted(muted) {
-  isMuted = muted;
-  if (isMuted) {
-    stopBackgroundMusic();
-  } else {
-    startBackgroundMusic();
-  }
+  Howler.mute(muted);
+  if (!muted) startBackgroundMusic();
 }
 
 /**
- * Returns the current mute state.
+ * Returns the current global mute state.
  * @returns {boolean}
  */
 function getMuted() {
-  return isMuted;
+  return Howler._muted;
 }
 
 export { playSpinSound, playStopTickSound, playWinSound, startBackgroundMusic, stopBackgroundMusic, setMuted, getMuted };
