@@ -71,7 +71,7 @@ describe('POST /api/spin', () => {
   it('uses STARTING_CREDITS when credits is not provided', async () => {
     const { status, body } = await postSpin({ bet: MIN_BET });
     assert.strictEqual(status, 200);
-    assert.ok(body.credits <= STARTING_CREDITS);
+    assert.strictEqual(body.credits, STARTING_CREDITS - MIN_BET + body.payout);
   });
 
   it('returns 400 when bet is missing', async () => {

@@ -9,6 +9,9 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -21,8 +24,28 @@ const app = express();
 const PORT = process.env.PORT ?? 3000;
 const DEV_MODE = process.env.DEV_MODE === 'true';
 
+const spinLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests — slow down.' },
+});
+
+app.use(helmet({
+  contentSecurityPolicy: DEV_MODE
+    ? false
+    : {
+        directives: {
+          ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+          'script-src': ["'self'", 'https://cdn.jsdelivr.net'],
+        },
+      },
+}));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(cors());
 app.use(express.json());
+app.use('/api/spin', spinLimiter);
 
 if (DEV_MODE) {
   // Inject window.DEV_MODE before static middleware so debug UI activates

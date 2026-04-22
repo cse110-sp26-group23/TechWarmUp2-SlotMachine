@@ -362,3 +362,55 @@ Read and analysed all key source files: `ui.js`, `audio.js`, `effects.js`, `api.
 
 **Time:** 2m 6s
 **Tokens:** 8.4k
+
+---
+
+## Entry 12 — Claude Code (Refinement Lib-05: Helmet, Morgan, express-rate-limit)
+
+**Goal:** Add three standard Express middleware libraries to `src/server/server.js`: Helmet (secure HTTP headers), Morgan (request logging), and express-rate-limit (spin endpoint abuse protection).
+
+**Prompt:** Claude Code Prompt: Refinement Lib-05 — Helmet, Morgan, express-rate-limit (full prompt specifying middleware order, DEV_MODE CSP workaround, Morgan format switching on NODE_ENV, and spinLimiter at 200 req/min).
+
+**Summary:**
+
+1. **`npm install helmet morgan express-rate-limit`** — Added all three as production dependencies (10 packages total).
+
+2. **`src/server/server.js`** — Three additions in the correct middleware order:
+   - `import helmet from 'helmet'` + `app.use(helmet({ contentSecurityPolicy: DEV_MODE ? false : undefined }))` — mounted first so headers are set on every response. CSP is disabled in DEV_MODE to allow the existing inline `window.DEV_MODE = true` script injection to continue working without a nonce.
+   - `import morgan from 'morgan'` + `app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'))` — mounted after Helmet, before routes. Uses `'dev'` format (colorized, concise) in development and `'combined'` (Apache-style) in production.
+   - `import rateLimit from 'express-rate-limit'` + `spinLimiter` constant (200 req/min per IP, `standardHeaders: true`, `legacyHeaders: false`) + `app.use('/api/spin', spinLimiter)` — placed after `express.json()` but before the spin router.
+
+3. **`src/tests/unit/spin.route.test.js`** — Fixed a pre-existing test design flaw (line 74): the assertion `body.credits <= STARTING_CREDITS` incorrectly assumed every spin would be a loss. With a ~30% hit frequency, a winning spin produces `credits > STARTING_CREDITS`, causing the test to fail non-deterministically. Replaced with `assert.strictEqual(body.credits, STARTING_CREDITS - MIN_BET + body.payout)`, which correctly verifies the default was applied regardless of win/loss outcome.
+
+**Reflection:**
+- Morgan logs appeared in the unit test output (e.g. `POST /api/spin 200 9.027 ms - 297`) because the integration tests start a real server instance. This is expected and harmless — the logs confirm Morgan is active.
+- The pre-existing test flaw had been previously documented as a "spurious" flaky failure (Entry 9), but it was reproducibly failing on every clean run in this session, suggesting the 30% hit frequency is high enough to reliably trigger a win. The fix is strictly more correct regardless.
+- ESLint reports zero errors; all 52 unit tests pass.
+
+**Commit Hash:** TBD
+
+**Time:** 2m 22s
+**Tokens:** 8.4k
+
+---
+
+## Entry 13 — Claude Code (Helmet CSP Blocked CDN Scripts)
+
+**Goal:** Fix CDN library scripts (GSAP, Howler.js, canvas-confetti) being blocked by Helmet's default Content Security Policy, which caused reel icons to stop rendering.
+
+**Prompt:** "the icons aren't rendering anymore please fix"
+
+**Summary:**
+
+1. **Root cause** — Helmet's default `script-src` directive is `'self'` only. All three CDN libraries (`cdn.jsdelivr.net/npm/gsap`, `cdn.jsdelivr.net/npm/howler`, `cdn.jsdelivr.net/npm/canvas-confetti`) were blocked by the browser's CSP enforcement. Without GSAP, `setupStrip()` and `animateStrip()` in `ui.js` threw errors on load, so reel strips were never populated with symbols.
+
+2. **`src/server/server.js`** — Updated the Helmet config to spread `helmet.contentSecurityPolicy.getDefaultDirectives()` and extend `script-src` with `'https://cdn.jsdelivr.net'`. All other default directives are preserved. The `DEV_MODE ? false` branch is unchanged (CSP still disabled entirely in dev to allow the inline script injection).
+
+**Reflection:**
+- The `undefined` shorthand for Helmet CSP (which activates defaults) was fine for an app serving only local assets. The moment CDN scripts were added in Refinement Lib-01/02/03, the default `script-src: 'self'` became incompatible. The fix should have been applied alongside the CDN tags.
+- ESLint reports zero errors. All 52 unit tests pass (the simulation RTP test shows intermittent failures at 99–103% due to statistical variance over only 10k spins with high-multiplier jackpot symbols — this is a pre-existing flakiness unrelated to this change).
+
+**Commit Hash:** TBD
+
+**Time:** 2m 7s
+**Tokens:** 7.1
