@@ -42,7 +42,7 @@ async function postForceSpin(bet, credits, winTier) {
   const response = await fetch(`${API_BASE}/api/debug/force-spin`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ bet, credits, winTier }),
+    body: JSON.stringify({ bet, credits, tier: winTier }),
   });
 
   if (!response.ok) {

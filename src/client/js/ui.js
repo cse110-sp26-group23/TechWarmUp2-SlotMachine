@@ -5,7 +5,7 @@
  */
 
 import { postSpin, postForceSpin } from './api.js';
-import { playSpinSound, playStopTickSound, playWinSound } from './audio.js';
+import { playSpinSound, playStopTickSound, playWinSound, playRiserSound, startBackgroundMusic } from './audio.js';
 import { spawnConfetti, addScreenFlash, spawnBouncingBalls, spawnLightBursts, showSlamText } from './effects.js';
 
 // Basketball symbol emoji map — mirrors server paytable IDs
@@ -79,24 +79,37 @@ function getCellHeight() {
 }
 
 /**
- * Returns a random symbol emoji for populating spin strips.
- * @returns {string} An emoji string.
+ * Returns a random symbol ID for populating the scrolling spin strip.
+ * @returns {string} A symbol ID key.
  */
-function randomEmoji() {
-  return SYMBOL_EMOJI[SYMBOL_IDS[Math.floor(Math.random() * SYMBOL_IDS.length)]];
+function randomSymbolId() {
+  return SYMBOL_IDS[Math.floor(Math.random() * SYMBOL_IDS.length)];
 }
 
 /**
  * Creates a single reel cell element.
- * @param {string} emoji - Symbol emoji to display.
+ * Attempts to load assets/images/symbols/{symbolId}.png; falls back to the
+ * emoji glyph if the image is absent or fails to load.
+ * @param {string} symbolId - A key from SYMBOL_EMOJI.
  * @returns {HTMLElement}
  */
-function createCell(emoji) {
+function createCell(symbolId) {
   const cell = document.createElement('div');
   cell.className = 'reel__cell';
+
+  const img = document.createElement('img');
+  img.className = 'reel__symbol-img';
+  img.src = `assets/images/symbols/${symbolId}.png`;
+  img.alt = '';
+  img.setAttribute('aria-hidden', 'true');
+  img.addEventListener('load', () => cell.classList.add('reel__cell--has-image'), { once: true });
+  img.addEventListener('error', () => img.remove(), { once: true });
+
   const sym = document.createElement('span');
   sym.className = 'reel__symbol';
-  sym.textContent = emoji;
+  sym.textContent = SYMBOL_EMOJI[symbolId] ?? '?';
+
+  cell.appendChild(img);
   cell.appendChild(sym);
   return cell;
 }
@@ -115,11 +128,11 @@ function setupStrip(reelIndex, topId, midId, botId) {
   strip.innerHTML = '';
 
   for (let i = 0; i < SPIN_CELL_COUNT; i++) {
-    strip.appendChild(createCell(randomEmoji()));
+    strip.appendChild(createCell(randomSymbolId()));
   }
-  strip.appendChild(createCell(SYMBOL_EMOJI[topId] ?? '?'));
-  strip.appendChild(createCell(SYMBOL_EMOJI[midId] ?? '?'));
-  strip.appendChild(createCell(SYMBOL_EMOJI[botId] ?? '?'));
+  strip.appendChild(createCell(topId));
+  strip.appendChild(createCell(midId));
+  strip.appendChild(createCell(botId));
 }
 
 /**
@@ -198,7 +211,7 @@ function applyWinAnimation(winTier, matchCount) {
   if (winTier === 'big' || winTier === 'jackpot') {
     addScreenFlash();
     spawnLightBursts();
-    spawnBouncingBalls(winTier === 'jackpot' ? 8 : 3);
+    spawnBouncingBalls(winTier === 'jackpot' ? 15 : 8);
     showSlamText(winTier);
   }
 
@@ -273,38 +286,47 @@ function refreshBetDisplay() {
 async function runSpinSequence(reels, payline, payout, newCredits, winTier, matchCount) {
   clearWinClasses();
 
-  // Set up all 5 strips before starting (determine outcome before animation)
   for (let i = 0; i < 5; i++) {
     setupStrip(i, reels[i][0], reels[i][1], reels[i][2]);
   }
 
   playSpinSound();
+  startBackgroundMusic();
 
-  // Base spin duration increases per reel for suspense
   const baseDuration = 900;
 
-  // Animate each reel sequentially with stagger
+  // Kick off all strips with staggered starts; collect their completion promises
+  // so tick sounds and riser sounds fire exactly when each reel physically lands.
+  const stripPromises = Array.from({ length: 5 }, (_, i) =>
+    new Promise((resolve) => {
+      setTimeout(
+        () => animateStrip(i, baseDuration + i * STOP_STAGGER_MS).then(resolve),
+        i * STOP_STAGGER_MS
+      );
+    })
+  );
+
+  let chainBroken = false;
+
   for (let i = 0; i < 5; i++) {
-    const duration = baseDuration + i * STOP_STAGGER_MS;
-    if (i === 0) {
-      animateStrip(i, duration);
-    } else {
-      // Start each subsequent reel slightly after the previous
-      setTimeout(() => {
-        animateStrip(i, duration);
-      }, i * STOP_STAGGER_MS);
+    await stripPromises[i];
+    playStopTickSound();
+    updateReelAriaLabel(i, payline[i]);
+
+    // Play a rising riser tone while the chain is still live (reels 2–4)
+    if (i > 0 && !chainBroken) {
+      if (payline[i] === payline[0]) {
+        if (i < 4) {
+          const chainLen = i + 1;
+          setTimeout(() => playRiserSound(chainLen), 120);
+        }
+      } else {
+        chainBroken = true;
+      }
     }
   }
 
-  // Wait for each reel to land and play its stop-tick sound
-  for (let i = 0; i < 5; i++) {
-    const landTime = baseDuration + i * STOP_STAGGER_MS;
-    await new Promise((resolve) => setTimeout(resolve, i === 0 ? landTime : STOP_STAGGER_MS));
-    playStopTickSound();
-    updateReelAriaLabel(i, payline[i]);
-  }
-
-  // Show win feedback after all reels land
+  // All reels have landed — show win feedback now
   if (payout > 0) {
     playWinSound(winTier);
     applyWinAnimation(winTier, matchCount);
@@ -487,6 +509,20 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
+/**
+ * Wires up load/error handlers on paytable symbol images.
+ * On successful load the parent cell gets .paytable__symbol-cell--has-image,
+ * switching the img on and the emoji off via CSS.
+ */
+function initPaytableImages() {
+  document.querySelectorAll('.paytable__symbol-img').forEach((img) => {
+    img.addEventListener('load', () => {
+      img.closest('.paytable__symbol-cell').classList.add('paytable__symbol-cell--has-image');
+    }, { once: true });
+    img.addEventListener('error', () => img.remove(), { once: true });
+  });
+}
+
 // Seed all reels with staggered symbols on first load
 (function initReels() {
   for (let i = 0; i < 5; i++) {
@@ -500,3 +536,4 @@ document.addEventListener('keydown', (event) => {
 refreshBetDisplay();
 updateCreditsDisplay(currentCredits);
 initDevMode();
+initPaytableImages();

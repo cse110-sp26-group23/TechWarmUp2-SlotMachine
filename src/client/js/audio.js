@@ -3,34 +3,45 @@
  * @author Brendan Barber
  * @part-of CSE 110 Tech Warm-Up 2
  *
- * Background music is managed by a Howler.js Howl instance (streams bg-music.mp3).
- * Sound effects remain oscillator-based synthesis via Howler's shared AudioContext.
+ * All sound effects and background music are managed by Howler.js Howl instances.
  * Global mute is handled by Howler.mute() which silences all Howl instances at once.
+ * The riser (chain-build tension) sound remains oscillator-based since no file exists for it.
  */
 
-/** Background music Howl — streams instead of decoding the full file upfront. */
+/** Background music — streamed via html5 to avoid decoding the full file upfront. */
 const bgMusic = new Howl({
-  src: ['assets/audio/bg-music.mp3', 'assets/audio/bg-music.ogg'],
+  src: ['assets/audio/bg-music.mp3'],
   loop: true,
   volume: 0.12,
   html5: true,
 });
 
-bgMusic.on('loaderror', () => {
-  // File not available yet — silently ignore
+/** Spin button SFX. */
+const sfxSpin = new Howl({ src: ['assets/audio/spin.mp3'], volume: 0.7 });
+
+/** Per-reel stop tick SFX. */
+const sfxStopTick = new Howl({ src: ['assets/audio/stop-tick.mp3'], volume: 0.6 });
+
+/** Tiered win SFX. */
+const sfxWinSmall   = new Howl({ src: ['assets/audio/win-small.mp3'],   volume: 0.75 });
+const sfxWinBig     = new Howl({ src: ['assets/audio/win-big.mp3'],     volume: 0.8 });
+const sfxWinJackpot = new Howl({ src: ['assets/audio/win-jackpot.mp3'], volume: 0.9 });
+
+// Silently ignore missing files so the game runs without all assets present
+[bgMusic, sfxSpin, sfxStopTick, sfxWinSmall, sfxWinBig, sfxWinJackpot].forEach((h) => {
+  h.on('loaderror', () => {});
 });
 
 /**
- * Returns Howler's shared AudioContext, creating it lazily via Howler's
- * autoplay-unlock mechanism so synthesized tones benefit from the same unlock flow.
- * @returns {AudioContext}
+ * Returns Howler's shared AudioContext for oscillator-based synthesis (riser sound).
+ * @returns {AudioContext|null}
  */
 function getAudioContext() {
   return Howler.ctx;
 }
 
 /**
- * Generates a short synthesized tone through the shared AudioContext.
+ * Generates a short synthesized tone — used only for the riser effect.
  * @param {AudioContext} ctx
  * @param {number} frequency - Hz.
  * @param {number} duration - Seconds.
@@ -50,19 +61,32 @@ function playTone(ctx, frequency, duration, volume = 0.3) {
   oscillator.stop(ctx.currentTime + duration);
 }
 
-/** Plays the spin start sound (rising two-note sweep). */
+/** Plays the spin start sound. */
 function playSpinSound() {
-  const ctx = getAudioContext();
-  if (!ctx) return;
-  playTone(ctx, 280, 0.1, 0.18);
-  setTimeout(() => playTone(ctx, 420, 0.12, 0.15), 80);
+  sfxSpin.play();
 }
 
 /** Plays the per-reel stop tick. */
 function playStopTickSound() {
+  sfxStopTick.play();
+}
+
+/**
+ * Plays a rising tension tone as consecutive payline reels land in a chain.
+ * Pitch and volume escalate with each added match — called after reels 2, 3, and 4.
+ * @param {number} chainLength - Consecutive matching reels so far (2–4).
+ */
+function playRiserSound(chainLength) {
   const ctx = getAudioContext();
   if (!ctx) return;
-  playTone(ctx, 580, 0.07, 0.22);
+
+  // C5 → E5 → G5 per step
+  const pitches = [0, 0, 523, 659, 784, 1046];
+  const pitch = pitches[Math.min(chainLength, 5)];
+  const vol = 0.18 + chainLength * 0.07;
+
+  playTone(ctx, pitch, 0.18, vol);
+  setTimeout(() => playTone(ctx, pitch * 1.25, 0.12, vol * 0.45), 70);
 }
 
 /**
@@ -71,21 +95,9 @@ function playStopTickSound() {
  */
 function playWinSound(winTier) {
   if (winTier === 'none') return;
-  const ctx = getAudioContext();
-  if (!ctx) return;
-
-  if (winTier === 'small') {
-    playTone(ctx, 523, 0.14, 0.28);
-    setTimeout(() => playTone(ctx, 659, 0.14, 0.28), 140);
-  } else if (winTier === 'big') {
-    [523, 659, 784].forEach((freq, i) => {
-      setTimeout(() => playTone(ctx, freq, 0.18, 0.4), i * 130);
-    });
-  } else if (winTier === 'jackpot') {
-    [523, 659, 784, 1046, 784, 1046, 1318].forEach((freq, i) => {
-      setTimeout(() => playTone(ctx, freq, 0.2, 0.5), i * 140);
-    });
-  }
+  if (winTier === 'small')   sfxWinSmall.play();
+  else if (winTier === 'big')     sfxWinBig.play();
+  else if (winTier === 'jackpot') sfxWinJackpot.play();
 }
 
 /**
@@ -102,8 +114,7 @@ function stopBackgroundMusic() {
 }
 
 /**
- * Sets the global mute state via Howler, which silences all Howl instances and
- * the synthesized oscillator sounds simultaneously.
+ * Sets the global mute state via Howler, which silences all Howl instances at once.
  * @param {boolean} muted
  */
 function setMuted(muted) {
@@ -119,4 +130,4 @@ function getMuted() {
   return Howler._muted;
 }
 
-export { playSpinSound, playStopTickSound, playWinSound, startBackgroundMusic, stopBackgroundMusic, setMuted, getMuted };
+export { playSpinSound, playStopTickSound, playWinSound, playRiserSound, startBackgroundMusic, stopBackgroundMusic, setMuted, getMuted };

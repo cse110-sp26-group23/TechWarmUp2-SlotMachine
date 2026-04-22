@@ -414,3 +414,146 @@ Read and analysed all key source files: `ui.js`, `audio.js`, `effects.js`, `api.
 
 **Time:** 2m 7s
 **Tokens:** 7.1
+
+---
+
+## Entry 14 — Claude Code (Debug Mode & Background Music Audit)
+
+**Goal:** Verify that the debug mode described in `src/refinement-2.md` had been fully implemented, and diagnose why `bg-music.mp3` placed in `assets/audio/` was not appearing in browser DevTools.
+
+**Prompt:** "Has the 'debug mode' mentioned in src/refinement-2.md been implemented?" / "I put bg-music.mp3 but it doesn't show up in sources in dev tools when I visit page"
+
+**Summary:**
+
+1. **Debug mode audit** — Read `src/server/routes/debug.js`, `src/server/server.js`, `src/client/index.html`, `src/client/js/ui.js`, and `src/client/js/api.js`. Confirmed the full implementation: `POST /api/debug/force-spin` endpoint (403-gated on `DEV_MODE`), server-side `window.DEV_MODE = true` injection, hidden DEV button in HTML, debug modal with four force-spin buttons, and `handleDebugSpin()` in `ui.js`.
+
+2. **Background music root cause** — Discovered `startBackgroundMusic` is exported from `audio.js` but never imported or called in `ui.js`. The `Howl` instance is created at module load, but `bgMusic.play()` is never triggered because nothing calls the function after a user gesture. The file path (`assets/audio/bg-music.mp3`) and static serving config are correct — the bug is a missing call site, not a path issue.
+
+**Reflection:**
+- The debug mode was fully and correctly implemented — all 7 pieces (endpoint, gate, server injection, HTML button, modal, JS handler, npm script) were in place.
+- The background music bug was introduced when Howler replaced the original `<audio>` element: the old code called `startBackgroundMusic()` from `setMuted()` on unmute but nothing ever made the initial call after first user interaction. This was identified as a call-site omission, not a Howler integration error.
+
+**Commit Hash:** TBD
+
+**Time:** 6m 12s
+**Tokens:** 12.4k
+
+---
+
+## Entry 15 — Claude Code (nodemon Permission Denied Diagnosis)
+
+**Goal:** Diagnose and fix "Permission denied" error when running `npm run dev:debug` in the WSL environment.
+
+**Prompt:** "sh: 1: nodemon: Permission denied" / series of follow-up diagnostic steps
+
+**Summary:**
+
+1. **Root cause** — `node_modules/.bin/nodemon` had permissions `-rw-r--r--` (644) — missing the execute bit. This is a known WSL/NTFS interop issue where files created on the Windows-side filesystem may not receive the execute permission that npm normally sets.
+
+2. **Fix** — `chmod +x node_modules/.bin/nodemon` restores the execute bit. For future installs in the same environment, `chmod +x node_modules/.bin/*` fixes all binaries at once.
+
+**Reflection:**
+- The `npm install` reporting "up to date, 306 packages" confirmed packages were installed correctly; the issue was purely the missing execute permission on the binary, not a missing dependency. The `NODE_ENV` was blank so devDependency skipping was ruled out early.
+- The Bash tool cannot access the WSL UNC path (`\\wsl.localhost\Ubuntu\...`) so all diagnosis was done by asking the user to run commands and relaying the fix.
+
+**Commit Hash:** N/A (no code change)
+
+**Time:** 4m 31s
+**Tokens:** 6.2k
+
+---
+
+## Entry 16 — Claude Code (Refinement 3 Implementation)
+
+**Goal:** Implement all 7 requirements from Refinement 3: fix celebration timing, more intense visual effects, riser-hit sounds, skeuomorphic basketball-textured UI, image support for reel symbols, verify asset loading, and solid non-transparent UI backgrounds.
+
+**Prompt:** Full Refinement 3 prompt specifying: celebration after last reel stops, more basketballs + blocking slam text, riser sounds on chain build, busier textured UI (skeuomorphic/physical), image-replaceable slot icons with emoji fallback, asset loading verification, and solid backgrounds.
+
+**Summary:**
+
+1. **`src/client/js/audio.js`** — Added `playRiserSound(chainLength)` which plays a rising two-tone oscillator burst (C5→E5→G5 pitch ladder, escalating volume) to build tension as consecutive payline reels land. Exported alongside existing functions.
+
+2. **`src/client/js/ui.js`** — Five changes:
+   - Imported `playRiserSound` and `startBackgroundMusic` (fixing the missing bg-music call).
+   - Renamed `randomEmoji()` → `randomSymbolId()` (returns ID, not emoji).
+   - Rewrote `createCell(symbolId)` to render an `<img src="assets/images/symbols/{id}.png">` with an emoji `<span>` fallback; on image load it adds `.reel__cell--has-image`; on error it removes the `<img>` element.
+   - Updated `setupStrip()` to pass symbol IDs directly to `createCell` instead of pre-converting to emojis.
+   - Rewrote `runSpinSequence()` to collect each strip's animation `Promise` and await them in order — fixing the timing bug where celebrations fired ~1 s before the last reel landed. Added `startBackgroundMusic()` on spin start. Added `playRiserSound()` calls after reels 2–4 when the payline chain is still live. Increased jackpot ball count from 8 → 15, big win from 3 → 8.
+
+3. **`src/client/js/effects.js`** — `spawnBouncingBalls()`: balls are now 4.5–6 rem (up from 2.5 rem) and randomly do a second bounce arc. `showSlamText()`: removed `gsap.set(el, { xPercent: -50 })` since the element is now full-screen flex-centered.
+
+4. **`src/client/scss/_animations.scss`** — `.slam-text` is now a full-screen fixed overlay (`inset: 0`, `background: rgb(0 0 0 / 80%)`, `display: flex`) with 3–7 rem text blocking the screen. `--subtle` variant is a top-of-screen banner only. `@keyframes screen-flash` peak opacity raised from 0.25 → 0.55.
+
+5. **`src/client/scss/_controls.scss`** — Spin button: basketball leather texture using multi-stop gradient, specular radial highlight, two seam lines via `::before`/`::after`, heavy 3D box-shadow stack, `overflow: hidden`. Bet `+`/`−` buttons: physical rubber button look with radial highlight, beveled border, press shadow, orange-glow hover. Mute toggle: matching physical button treatment. Paytable: solid `#080c14` background.
+
+6. **`src/client/scss/_layout.scss`** — Header: repeating court wood-grain stripe gradient over dark wood base. Stats bar: near-black scoreboard background with orange LED border glow, gold text with glow. Jackpot tiers: solid `#070b12` with per-tier glowing colored borders replacing transparent glass. Win display message: `font-size` raised to `$font-size-xl`.
+
+7. **`src/client/scss/_reels.scss`** — Reels container: stronger orange border + heavy inset shadow. Individual reels: glossy top-highlight gradient over `#090c14` base. Added `.reel__symbol-img` (hidden by default) and `.reel__cell--has-image` modifier (shows img, hides emoji).
+
+**Reflection:**
+- The timing bug was caused by a mismatch between the `setTimeout`-based wait loop (which used `STOP_STAGGER_MS` for all reels after the first) and the actual landing times (which are `startDelay + animationDuration`, a larger value). Awaiting the actual GSAP Promise for each strip is the correct and minimal fix.
+- The `--has-image` CSS class must be on `.reel__cell`, not `.reel`, because the JS adds it to the cell div. An initial draft placed the selector incorrectly inside `.reel` (compiling to `.reel.reel__cell--has-image`) and was corrected to `&__cell--has-image`.
+- The `gsap.set(el, { xPercent: -50 })` in `showSlamText` was necessary for the old `position: fixed; left: 50%` layout but causes incorrect GSAP transform composition with the new full-screen flex approach — removing it is the correct fix.
+
+**Commit Hash:** TBD
+
+**Time:** 15m 18s
+**Tokens:** 44.6k
+
+---
+
+## Entry 17 — Claude Code (MP3 Sound Effects + DEV_MODE Force-Spin Fix)
+
+**Goal:** Wire the six placed MP3 files into Howler so sound effects use real audio instead of oscillator synthesis, and fix the debug force-spin endpoint which was returning errors in DEV_MODE.
+
+**Prompt:** "Sound effects are still using synthetic for everything except background music. I have added audio mp3s but they aren't being used. Also DEV_MODE is broken and the POST requests are not working in dev mode even though the button is there."
+
+**Summary:**
+
+1. **`src/client/js/audio.js`** — Full rewrite of the sound effect layer. Created five new module-level `Howl` instances for the placed MP3s (`spin.mp3`, `stop-tick.mp3`, `win-small.mp3`, `win-big.mp3`, `win-jackpot.mp3`) with appropriate volumes. Registered a no-op `loaderror` handler on all six Howls (including `bgMusic`) so missing files stay silent. Updated `playSpinSound()`, `playStopTickSound()`, and `playWinSound()` to call `.play()` on the corresponding Howl instance instead of the oscillator. Retained `getAudioContext()`, `playTone()`, and `playRiserSound()` unchanged since no MP3 exists for the riser effect.
+
+2. **`src/client/js/api.js`** — Fixed a field name mismatch: `postForceSpin` was sending `{ winTier }` in the request body but the Zod schema in `debug.js` (`ForceTierSchema`) expects the field to be named `tier`. Changed the JSON body to `{ bet, credits, tier: winTier }`. Every force-spin request was failing Zod validation with a 400 before even reaching the DEV_MODE check.
+
+**Reflection:**
+- The audio bug was a straightforward omission — the Howl instances were never created for the SFX files, so the existing oscillator code continued to run. The fix is purely additive: create the Howls and redirect the three play functions.
+- The DEV_MODE bug was introduced in Entry 11 (Zod refactor) when the schema field was renamed from `winTier` to `tier` but `api.js` was not updated. The 400 error from Zod meant the endpoint always rejected requests before the `DEV_MODE !== 'true'` guard was ever evaluated, making the UI appear to "work" (button present, request sent) but silently fail.
+
+**Commit Hash:** TBD
+
+**Time:** 1m 52s
+**Tokens:** 5.1k
+
+---
+
+## Entry 18 — Claude Code (Refinement 4: Scoreboard Style + Symbol Images)
+
+**Goal:** Reduce heavy text glows throughout the UI to feel more like a physical scoreboard, and implement PNG image support for all 7 reel symbols with emoji fallback — including in the paytable.
+
+**Prompt:** "Remove the glowing effect of a lot of the text and try to subtly give it a more 'scoreboard' vibe. Implement empty images for the actual slot icons instead of the emojis. The emojis can be a fallback but make sure there is support, and add empty images with the right sizes to the client/assets/images/symbols that can be replaced. Make sure the paytable also supports these images!"
+
+**Summary:**
+
+1. **`src/client/assets/images/symbols/`** (new directory + 7 PNG files) — Created 96×96 placeholder PNG files for each symbol (`basketball`, `sneaker`, `jersey`, `trophy`, `star`, `flame`, `ring`) using a pure-Python PNG generator. Each is a colored circle on a transparent background (color-coded per symbol) so cells are visually distinct while awaiting real artwork.
+
+2. **`src/client/scss/_variables.scss`** — Added `$font-digital: 'Courier New', 'Lucida Console', monospace` for use on scoreboard number displays.
+
+3. **`src/client/scss/_layout.scss`** — Four glow reductions:
+   - `.app__title`: replaced `text-shadow: 0 0 12px rgb(255 107 26 / 60%)` with a plain drop shadow `0 1px 4px rgb(0 0 0 / 80%)`.
+   - `.jackpot-tier__value`: reduced `0 0 8px currentcolor` → `0 0 3px currentcolor`; added `font-family: $font-digital` for the LED-readout effect.
+   - `.stats__value`: reduced `0 0 10px rgb(255 204 0 / 55%)` → `0 0 4px rgb(255 204 0 / 30%)`; added `font-family: $font-digital` and `letter-spacing: 0.04em` for a scoreboard digit feel.
+   - `.win-display__message`: replaced bloom glow with plain drop shadow `0 1px 4px rgb(0 0 0 / 80%)`.
+
+4. **`src/client/scss/_controls.scss`** — Spin button `text-shadow`: removed the `0 0 20px rgb(255 200 80 / 55%)` glow half, leaving only the drop shadow. Added `.paytable__symbol-cell`, `.paytable__symbol-img`, and `.paytable__symbol-cell--has-image` rules to show the image and hide the emoji once the image loads.
+
+5. **`src/client/index.html`** — Updated all 7 paytable `<td>` symbol cells to the `<img>` + `<span class="paytable__symbol-emoji">` + `<span>` structure with `class="paytable__symbol-cell"`.
+
+6. **`src/client/js/ui.js`** — Added `initPaytableImages()` which attaches `load`/`error` listeners to every `.paytable__symbol-img` element: on load it adds `.paytable__symbol-cell--has-image` to the parent cell; on error it removes the broken `<img>`.
+
+**Reflection:**
+- The `$?` exit code showed as `True` in PowerShell when passing through `wsl -- sh -c "... && echo $?"` — this is because PowerShell expands `$?` to its own boolean `True` before the string reaches WSL. Actual success was confirmed by checking the CSS file's modification timestamp and grepping the compiled output for the new selectors.
+- All linters (ESLint, Stylelint, HTMLHint) pass with zero errors.
+
+**Commit Hash:** TBD
+
+**Time:** 8m 12s
+**Tokens:** 22.4k

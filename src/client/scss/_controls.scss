@@ -10,28 +10,81 @@
 }
 
 .spin-button {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   padding: $space-sm $space-xl;
-  background: linear-gradient(180deg, #ff8040 0%, $color-accent 50%, #e05a10 100%);
+  background:
+    radial-gradient(ellipse at 28% 22%, rgb(255 255 255 / 22%) 0%, transparent 52%),
+    linear-gradient(160deg,
+      #ff9f60 0%,
+      #e86020 22%,
+      #c84808 52%,
+      #9c3604 80%,
+      #701c00 100%
+    );
   color: #fff;
-  border: none;
+  border: 3px solid #5a1000;
+  border-top-color: rgb(255 180 100 / 45%);
   border-radius: $radius-pill;
   font-size: $font-size-xl;
   font-weight: 900;
   letter-spacing: 0.12em;
   cursor: pointer;
   text-transform: uppercase;
-  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 20px rgb(255 107 26 / 55%), inset 0 1px 0 rgb(255 255 255 / 20%);
+  transition: filter 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  text-shadow: 0 2px 6px rgb(0 0 0 / 80%);
+  box-shadow:
+    0 8px 32px rgb(180 60 10 / 70%),
+    0 3px 6px rgb(0 0 0 / 50%),
+    inset 0 3px 0 rgb(255 180 80 / 30%),
+    inset 0 -4px 0 rgb(0 0 0 / 40%);
   min-height: 52px;
 
+  // Basketball seam — horizontal
+  &::before {
+    content: '';
+    position: absolute;
+    left: -5%;
+    right: -5%;
+    top: 50%;
+    height: 2px;
+    transform: translateY(-50%);
+    background: rgb(0 0 0 / 18%);
+    border-radius: 50%;
+    box-shadow: 0 1px 0 rgb(255 255 255 / 7%);
+    pointer-events: none;
+  }
+
+  // Basketball seam — vertical
+  &::after {
+    content: '';
+    position: absolute;
+    top: -10%;
+    bottom: -10%;
+    left: 50%;
+    width: 2px;
+    transform: translateX(-50%);
+    background: rgb(0 0 0 / 15%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
   &:hover:not(:disabled) {
-    background: linear-gradient(180deg, #ff9050 0%, #ff7030 50%, #c84808 100%);
-    box-shadow: 0 6px 28px rgb(255 107 26 / 75%), inset 0 1px 0 rgb(255 255 255 / 20%);
+    filter: brightness(1.12);
+    box-shadow:
+      0 10px 40px rgb(200 80 20 / 80%),
+      0 4px 8px rgb(0 0 0 / 50%),
+      inset 0 3px 0 rgb(255 180 80 / 35%),
+      inset 0 -4px 0 rgb(0 0 0 / 40%);
   }
 
   &:active:not(:disabled) {
-    transform: scale(0.97);
+    transform: scale(0.97) translateY(1px);
+    box-shadow:
+      0 4px 16px rgb(180 60 10 / 60%),
+      0 1px 3px rgb(0 0 0 / 50%),
+      inset 0 4px 8px rgb(0 0 0 / 35%);
   }
 
   &:focus-visible {
@@ -40,9 +93,17 @@
   }
 
   &:disabled {
-    background-color: $color-accent-disabled;
+    background: linear-gradient(180deg, #555 0%, #333 100%);
+    border-color: #222;
     cursor: not-allowed;
     box-shadow: none;
+    text-shadow: none;
+    filter: none;
+
+    &::before,
+    &::after {
+      display: none;
+    }
   }
 }
 
@@ -52,22 +113,44 @@
   gap: $space-md;
 
   &__button {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    border: 2px solid $color-surface-raised;
-    background-color: $color-surface;
+    border: 2px solid #0d1525;
+    border-top-color: rgb(255 255 255 / 15%);
+    background:
+      radial-gradient(circle at 35% 28%, rgb(255 255 255 / 16%) 0%, transparent 65%),
+      linear-gradient(180deg, #253556 0%, #1a2640 40%, #111929 100%);
     color: $color-text;
     font-size: $font-size-lg;
+    font-weight: bold;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.15s ease, border-color 0.15s ease;
+    text-shadow: 0 1px 3px rgb(0 0 0 / 60%);
+    box-shadow:
+      0 4px 10px rgb(0 0 0 / 55%),
+      0 2px 4px rgb(0 0 0 / 35%),
+      inset 0 2px 0 rgb(255 255 255 / 10%),
+      inset 0 -2px 0 rgb(0 0 0 / 30%);
+    transition: filter 0.12s ease, transform 0.1s ease, box-shadow 0.12s ease;
 
     &:hover:not(:disabled) {
-      background-color: $color-surface-raised;
+      filter: brightness(1.22);
       border-color: $color-accent;
+      box-shadow:
+        0 5px 14px rgb(0 0 0 / 55%),
+        0 0 10px rgb(255 107 26 / 30%),
+        inset 0 2px 0 rgb(255 255 255 / 10%),
+        inset 0 -2px 0 rgb(0 0 0 / 30%);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow:
+        0 1px 4px rgb(0 0 0 / 55%),
+        inset 0 3px 6px rgb(0 0 0 / 35%);
     }
 
     &:focus-visible {
@@ -76,8 +159,9 @@
     }
 
     &:disabled {
-      opacity: 0.4;
+      opacity: 0.35;
       cursor: not-allowed;
+      box-shadow: 0 2px 4px rgb(0 0 0 / 30%);
     }
   }
 
@@ -94,17 +178,25 @@
 }
 
 .mute-toggle {
-  background: transparent;
-  border: 2px solid $color-border;
+  background:
+    radial-gradient(circle at 35% 30%, rgb(255 255 255 / 12%) 0%, transparent 65%),
+    linear-gradient(180deg, #253556 0%, #111929 100%);
+  border: 2px solid #0d1525;
+  border-top-color: rgb(255 255 255 / 12%);
   border-radius: $radius-md;
   padding: $space-xs $space-sm;
   cursor: pointer;
   font-size: $font-size-lg;
   line-height: 1;
-  transition: border-color 0.15s ease;
   color: $color-text;
+  box-shadow:
+    0 3px 8px rgb(0 0 0 / 45%),
+    inset 0 1px 0 rgb(255 255 255 / 8%),
+    inset 0 -2px 0 rgb(0 0 0 / 25%);
+  transition: filter 0.15s ease, border-color 0.15s ease;
 
   &:hover {
+    filter: brightness(1.2);
     border-color: $color-accent;
   }
 
@@ -121,8 +213,8 @@
 
 // Collapsible paytable
 .paytable {
-  background-color: $color-surface;
-  border: 1px solid $color-border;
+  background-color: #080c14;
+  border: 1px solid rgb(255 107 26 / 22%);
   border-radius: $radius-md;
   overflow: hidden;
 
@@ -207,4 +299,25 @@
     margin-top: $space-xs;
     text-align: center;
   }
+}
+
+// Paytable symbol cell — img + emoji fallback
+.paytable__symbol-cell {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+}
+
+.paytable__symbol-img {
+  display: none;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: $radius-sm;
+}
+
+.paytable__symbol-cell--has-image {
+  .paytable__symbol-img   { display: block; }
+  .paytable__symbol-emoji { display: none; }
 }

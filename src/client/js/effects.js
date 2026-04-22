@@ -58,28 +58,36 @@ function spawnConfetti() {
 }
 
 /**
- * Spawns bouncing basketball emoji elements across the screen using GSAP.
- * @param {number} [count=6] - Number of balls to spawn.
+ * Spawns large bouncing basketball emoji elements across the screen using GSAP.
+ * @param {number} [count=8] - Number of balls to spawn.
  */
-function spawnBouncingBalls(count = 6) {
+function spawnBouncingBalls(count = 8) {
   const container = getContainer();
+  const sizeRem = count >= 12 ? 6 : 4.5;
 
   for (let i = 0; i < count; i++) {
     const ball = document.createElement('div');
     ball.textContent = '🏀';
     ball.setAttribute('aria-hidden', 'true');
-    ball.style.cssText = 'position:absolute;font-size:2.5rem;pointer-events:none;';
+    ball.style.cssText = `position:absolute;font-size:${sizeRem}rem;pointer-events:none;line-height:1;`;
     container.appendChild(ball);
 
-    const startX = (10 + Math.random() * 80) + 'vw';
-    const startY = '110vh';
-    const peakY  = (10 + Math.random() * 40) + 'vh';
+    const startX = (5 + Math.random() * 85) + 'vw';
+    const startY = '115vh';
+    const peakY  = (5 + Math.random() * 35) + 'vh';
+    const doDouble = Math.random() > 0.5;
 
     gsap.set(ball, { x: startX, y: startY });
 
-    const tl = gsap.timeline({ delay: i * 0.12, onComplete: () => ball.remove() });
-    tl.to(ball, { y: peakY, duration: 0.55, ease: 'power2.out', rotation: -180 })
-      .to(ball, { y: startY, duration: 0.55, ease: 'bounce.out', rotation: -360 });
+    const tl = gsap.timeline({ delay: i * 0.1, onComplete: () => ball.remove() });
+    tl.to(ball, { y: peakY, duration: 0.5, ease: 'power2.out', rotation: -180 })
+      .to(ball, { y: startY, duration: 0.5, ease: 'bounce.out', rotation: -360 });
+
+    if (doDouble) {
+      const peakY2 = (15 + Math.random() * 40) + 'vh';
+      tl.to(ball, { y: peakY2, duration: 0.4, ease: 'power2.out', rotation: -540 })
+        .to(ball, { y: startY, duration: 0.4, ease: 'bounce.out', rotation: -720 });
+    }
   }
 }
 
@@ -131,12 +139,11 @@ function showSlamText(tier) {
   el.setAttribute('aria-hidden', 'true');
   document.body.appendChild(el);
 
-  const displayMs = tier === 'small' ? 1200 : 2000;
+  const displayMs = tier === 'small' ? 1400 : 2200;
 
-  gsap.set(el, { xPercent: -50 });
   gsap.timeline()
-    .fromTo(el, { scale: 3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(2)' })
-    .to(el, { scale: 0.8, opacity: 0, duration: 0.25, ease: 'power2.in', delay: displayMs / 1000, onComplete: () => el.remove() });
+    .fromTo(el, { scale: 1.3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(1.5)' })
+    .to(el, { opacity: 0, scale: 0.95, duration: 0.3, ease: 'power2.in', delay: displayMs / 1000, onComplete: () => el.remove() });
 }
 
 export { addScreenFlash, spawnConfetti, spawnBouncingBalls, spawnLightBursts, showSlamText };

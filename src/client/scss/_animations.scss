@@ -30,9 +30,12 @@
 
 // Full-screen flash on big/jackpot wins
 @keyframes screen-flash {
-  0%, 100% { opacity: 0; }
-  10%, 90% { opacity: 0.12; }
-  50% { opacity: 0.25; }
+  0%   { opacity: 0; }
+  8%   { opacity: 0.55; }
+  25%  { opacity: 0.35; }
+  55%  { opacity: 0.45; }
+  85%  { opacity: 0.2; }
+  100% { opacity: 0; }
 }
 
 // Radial light burst — expand and fade
@@ -44,22 +47,37 @@
 
 .slam-text {
   position: fixed;
-  top: 30%;
-  left: 50%;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: $z-flash;
-  font-size: clamp(1.8rem, 6vw, 3rem);
+  background: rgb(0 0 0 / 80%);
+  font-size: clamp(3rem, 11vw, 7rem);
   font-weight: 900;
   color: $color-gold;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  text-shadow: 0 0 20px rgb(255 204 0 / 60%), 0 2px 8px rgb(0 0 0 / 80%);
-  white-space: nowrap;
+  text-align: center;
+  padding: $space-xl;
   pointer-events: none;
+  text-shadow:
+    0 0 40px rgb(255 204 0 / 70%),
+    0 4px 14px rgb(0 0 0 / 90%),
+    0 0 80px rgb(255 107 26 / 40%);
 
   &--subtle {
-    font-size: clamp(1.2rem, 4vw, 1.8rem);
+    inset: unset;
+    top: 32%;
+    left: 0;
+    right: 0;
+    background: rgb(0 0 0 / 68%);
+    font-size: clamp(1.8rem, 6vw, 3rem);
     color: $color-win-small;
-    text-shadow: 0 0 12px rgb(76 175 80 / 50%), 0 2px 6px rgb(0 0 0 / 80%);
+    padding: $space-md $space-xl;
+    text-shadow:
+      0 0 20px rgb(76 175 80 / 55%),
+      0 2px 8px rgb(0 0 0 / 80%);
   }
 }
 
