@@ -1,4 +1,4 @@
-### Feature 1 — Basketball Theme
+### Feature 5 — Basketball Theme
 As a player,
 I want the symbols to match a basketball theme,
 so that the game feels cohesive and fun instead of generic.
