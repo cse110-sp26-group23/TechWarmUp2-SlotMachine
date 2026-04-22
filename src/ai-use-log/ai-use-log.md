@@ -229,3 +229,45 @@ Read and analysed all key source files: `ui.js`, `audio.js`, `effects.js`, `api.
 
 **Time:** 4m 31s
 **Tokens:** 24.5k
+
+---
+
+## Entry 8 — Claude Code (Refinement Lib-01: GSAP Animation Library)
+
+**Goal:** Replace manual CSS-transition + `setTimeout` animation code in `ui.js` and `effects.js` with GSAP (GreenSock Animation Platform).
+
+**Prompt:** Claude Code Prompt: Refinement Lib-01 — GSAP Animation Library (full prompt specifying `animateStrip`, `updateCreditsDisplay`, `showSlamText`, `spawnBouncingBalls`, and cleanup steps).
+
+**Summary:**
+
+1. **`src/client/index.html`** — Added GSAP CDN script tag (`gsap@3/dist/gsap.min.js`) before the ES module scripts so the global `gsap` object is available to all client JS.
+
+2. **`eslint.config.js`** — Added `gsap: 'readonly'` to the ESLint globals list so the linter doesn't flag the CDN-loaded global as undefined.
+
+3. **`src/client/js/ui.js`** — Four functions migrated to GSAP:
+   - `setupStrip()`: Removed `strip.style.transition = 'none'` and `strip.style.transform = 'translateY(0)'`; GSAP's `set()` in `animateStrip()` handles initial state.
+   - `animateStrip()`: Replaced `void strip.offsetWidth` reflow hack + CSS transition + `setTimeout` with `gsap.set(strip, { y: 0 })` + `gsap.to(strip, { y: -targetOffset, duration, ease: 'power2.in', onComplete: resolve })`.
+   - `updateCreditsDisplay()`: Replaced `classList.remove/add('stats__value--bump')` + `void offsetWidth` with a GSAP counter object (`gsap.to(counter, { value: amount, snap, onUpdate })`) and a `gsap.fromTo(creditsDisplay, { scale: 1.15 }, { scale: 1, ease: 'back.out(2)' })` scale pop.
+   - `animateJackpotTier()`: Replaced `classList.remove/add` + reflow hack + `animationend` listener with `gsap.fromTo(tierGrandEl, ..., { yoyo: true, repeat: 7, onComplete: clearProps })` for 4 full pulses at the same 2.4 s total duration.
+
+4. **`src/client/js/effects.js`** — Two functions migrated to GSAP:
+   - `spawnBouncingBalls()`: Replaced `setTimeout` stagger + `.basketball-bounce` CSS class with a GSAP timeline per ball (`delay: i * 0.12`, arc up via `power2.out`, arc down via `bounce.out`, `onComplete: ball.remove()`). Balls use `position: absolute` inside the fixed particles container.
+   - `showSlamText()`: Replaced `setTimeout` + `classList.add('slam-text--exit')` + `animationend` listener with a `gsap.timeline()` — `fromTo({ scale: 3, opacity: 0 }, { scale: 1, opacity: 1, ease: 'back.out(2)' })` entry, followed by `.to({ scale: 0.8, opacity: 0, ease: 'power2.in', onComplete: el.remove })` exit. Used `gsap.set(el, { xPercent: -50 })` to replace the CSS `transform: translateX(-50%)` centring that GSAP would otherwise override.
+
+5. **`src/client/scss/_animations.scss`** — Removed: `@keyframes credit-bump`, `@keyframes basketball-bounce`, `.basketball-bounce` class, `@keyframes slam-text-in`, `@keyframes slam-text-out`, `@keyframes jackpot-tier-pulse`, `animation:` declaration and `transform: translateX(-50%)` from `.slam-text`, and the `&--exit` modifier block. Kept: `.slam-text` base layout/typography styles, `.slam-text--subtle`, `.light-burst` (still CSS-animated), `.particle` (still CSS-animated), and remaining reel/win glow keyframes.
+
+6. **`src/client/scss/_layout.scss`** — Removed `.stats__value--bump { animation: credit-bump 0.35s ease-in-out; }` and the `&.jackpot-tier--active { animation: jackpot-tier-pulse ... }` block from `.jackpot-tier--grand`.
+
+7. **CSS rebuild** — `npm run build:css` compiled the updated SCSS with zero errors.
+
+**Reflection:**
+- All 52 unit tests pass and all three linters (ESLint, Stylelint, HTMLHint) report zero errors after the changes.
+- The `xPercent: -50` approach for slam text centering was necessary because GSAP's `scale` transform takes ownership of the element's CSS `transform` property, overriding the `translateX(-50%)` that previously handled horizontal centering. Moving centering into GSAP via `xPercent` is the idiomatic solution.
+- `@keyframes jackpot-tier-pulse` was orphaned after the CSS class referencing it was removed; caught and cleaned up during final review.
+- `--burst-duration` CSS custom property is still used by `spawnLightBursts()` (which was not migrated this run), so the `.light-burst` CSS rule and its `var(--burst-duration)` reference were intentionally left in place.
+- No hand-editing required; all issues were caught by linting and resolved programmatically.
+
+**Commit Hash:** TBD
+
+**Time:** 5m 40s
+**Tokens:** 23.9k

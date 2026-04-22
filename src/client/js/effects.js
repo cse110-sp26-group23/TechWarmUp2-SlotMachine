@@ -76,27 +76,28 @@ function spawnConfetti() {
 }
 
 /**
- * Spawns bouncing basketball emoji elements across the screen.
+ * Spawns bouncing basketball emoji elements across the screen using GSAP.
  * @param {number} [count=6] - Number of balls to spawn.
  */
 function spawnBouncingBalls(count = 6) {
   const container = getContainer();
 
   for (let i = 0; i < count; i++) {
-    setTimeout(() => {
-      const ball = document.createElement('div');
-      ball.className = 'basketball-bounce';
-      ball.textContent = '🏀';
-      ball.setAttribute('aria-hidden', 'true');
+    const ball = document.createElement('div');
+    ball.textContent = '🏀';
+    ball.setAttribute('aria-hidden', 'true');
+    ball.style.cssText = 'position:absolute;font-size:2.5rem;pointer-events:none;';
+    container.appendChild(ball);
 
-      const left = 10 + Math.random() * 80;
-      const duration = 1600 + Math.random() * 1200;
+    const startX = (10 + Math.random() * 80) + 'vw';
+    const startY = '110vh';
+    const peakY  = (10 + Math.random() * 40) + 'vh';
 
-      ball.style.cssText = `left: ${left}vw; top: 50vh; --bounce-duration: ${duration}ms;`;
+    gsap.set(ball, { x: startX, y: startY });
 
-      container.appendChild(ball);
-      ball.addEventListener('animationend', () => ball.remove(), { once: true });
-    }, i * 120);
+    const tl = gsap.timeline({ delay: i * 0.12, onComplete: () => ball.remove() });
+    tl.to(ball, { y: peakY, duration: 0.55, ease: 'power2.out', rotation: -180 })
+      .to(ball, { y: startY, duration: 0.55, ease: 'bounce.out', rotation: -360 });
   }
 }
 
@@ -135,7 +136,7 @@ function spawnLightBursts() {
 }
 
 /**
- * Displays a large basketball-themed win message overlay.
+ * Displays a large basketball-themed win message overlay using a GSAP timeline.
  * @param {'jackpot'|'big'|'small'} tier - Win tier determining the message pool and style.
  */
 function showSlamText(tier) {
@@ -150,10 +151,10 @@ function showSlamText(tier) {
 
   const displayMs = tier === 'small' ? 1200 : 2000;
 
-  setTimeout(() => {
-    el.classList.add('slam-text--exit');
-    el.addEventListener('animationend', () => el.remove(), { once: true });
-  }, displayMs);
+  gsap.set(el, { xPercent: -50 });
+  gsap.timeline()
+    .fromTo(el, { scale: 3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(2)' })
+    .to(el, { scale: 0.8, opacity: 0, duration: 0.25, ease: 'power2.in', delay: displayMs / 1000, onComplete: () => el.remove() });
 }
 
 export { addScreenFlash, spawnConfetti, spawnBouncingBalls, spawnLightBursts, showSlamText };

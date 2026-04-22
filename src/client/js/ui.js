@@ -113,8 +113,6 @@ function createCell(emoji) {
 function setupStrip(reelIndex, topId, midId, botId) {
   const strip = document.getElementById(`strip${reelIndex}`);
   strip.innerHTML = '';
-  strip.style.transition = 'none';
-  strip.style.transform = 'translateY(0)';
 
   for (let i = 0; i < SPIN_CELL_COUNT; i++) {
     strip.appendChild(createCell(randomEmoji()));
@@ -137,14 +135,13 @@ function animateStrip(reelIndex, spinDuration) {
     const cellHeight = getCellHeight();
     const targetOffset = SPIN_CELL_COUNT * cellHeight;
 
-    // Force a reflow so the browser registers the initial transform=0 state
-    // before we apply the transition — otherwise the transition won't play.
-    void strip.offsetWidth;
-
-    strip.style.transition = `transform ${spinDuration}ms cubic-bezier(0.15, 0, 0.25, 1)`;
-    strip.style.transform = `translateY(-${targetOffset}px)`;
-
-    setTimeout(resolve, spinDuration);
+    gsap.set(strip, { y: 0 });
+    gsap.to(strip, {
+      y: -targetOffset,
+      duration: spinDuration / 1000,
+      ease: 'power2.in',
+      onComplete: resolve,
+    });
   });
 }
 
@@ -160,18 +157,25 @@ function updateReelAriaLabel(reelIndex, symbolId) {
 }
 
 /**
- * Pulses the GRAND jackpot tier indicator then removes the active class.
+ * Pulses the GRAND jackpot tier indicator using GSAP (4 full pulses, 0.6 s each).
  */
 function animateJackpotTier() {
   if (!tierGrandEl) {
     return;
   }
-  tierGrandEl.classList.remove('jackpot-tier--active');
-  void tierGrandEl.offsetWidth;
-  tierGrandEl.classList.add('jackpot-tier--active');
-  tierGrandEl.addEventListener('animationend', () => {
-    tierGrandEl.classList.remove('jackpot-tier--active');
-  }, { once: true });
+  gsap.fromTo(
+    tierGrandEl,
+    { scale: 1, boxShadow: '0 0 12px rgb(255 204 0 / 30%)' },
+    {
+      scale: 1.08,
+      boxShadow: '0 0 28px rgb(255 204 0 / 80%)',
+      duration: 0.3,
+      ease: 'power2.inOut',
+      yoyo: true,
+      repeat: 7,
+      onComplete: () => gsap.set(tierGrandEl, { clearProps: 'scale,boxShadow' }),
+    }
+  );
 }
 
 /**
@@ -229,14 +233,21 @@ function showWinMessage(text) {
 }
 
 /**
- * Updates the credits display with a bump animation.
+ * Updates the credits display with an animated count-up and scale pop.
  * @param {number} amount - New credit total.
  */
 function updateCreditsDisplay(amount) {
-  creditsDisplay.textContent = amount;
-  creditsDisplay.classList.remove('stats__value--bump');
-  void creditsDisplay.offsetWidth;
-  creditsDisplay.classList.add('stats__value--bump');
+  const counter = { value: currentCredits };
+  gsap.to(counter, {
+    value: amount,
+    duration: 0.6,
+    ease: 'power1.out',
+    snap: { value: 1 },
+    onUpdate() {
+      creditsDisplay.textContent = Math.round(counter.value);
+    },
+  });
+  gsap.fromTo(creditsDisplay, { scale: 1.15 }, { scale: 1, duration: 0.35, ease: 'back.out(2)' });
 }
 
 /**

@@ -140,10 +140,6 @@ body {
     color: $color-tier-grand;
     border-color: rgb(255 204 0 / 40%);
     box-shadow: 0 0 12px rgb(255 204 0 / 30%), inset 0 1px 0 rgb(255 255 255 / 6%);
-
-    &.jackpot-tier--active {
-      animation: jackpot-tier-pulse 0.6s ease-in-out 4;
-    }
   }
 }
 
@@ -177,10 +173,6 @@ body {
     color: $color-text;
     font-variant-numeric: tabular-nums;
     display: block;
-
-    &--bump {
-      animation: credit-bump 0.35s ease-in-out;
-    }
   }
 }
 
