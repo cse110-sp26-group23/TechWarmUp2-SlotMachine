@@ -1,4 +1,4 @@
-### Feature 4 — Real Sound Effects
+### Feature 3 — Real Sound Effects
 As a player,
 I want actual audio files for spin, stop, and win sounds,
 so that the game sounds like a real slot machine and not a browser beep.
