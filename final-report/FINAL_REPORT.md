@@ -1,5 +1,11 @@
 # FINAL REPORT
 
+## Video
+
+[Video Link](https://youtu.be/owaCGjXinyM)
+
+[Slides Link](https://docs.google.com/presentation/d/1D5Y-2-eDGDYb-tvO5VO6U5EWNy4qU15TvfGYiyVfqCg/edit?usp=sharing)
+
 ## Overview
 This project was about building a browser-based basketball slot machine app from scratch using Claude Code as the primary development tool. The goal was to see how far AI-assisted engineering could take a real full-stack project (not just a toy, but something with server-side game math, a REST API, a tested client, accessibility, and iterative refinement across multiple sessions).
 
