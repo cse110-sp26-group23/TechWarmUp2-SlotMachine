@@ -49,7 +49,8 @@
       "PowerShell(wsl -e bash -c \"cd /root/110/TechWarmUp2-SlotMachine && node_modules/.bin/eslint --version 2>&1\")",
       "Bash(\"//wsl.localhost/Ubuntu/root/110/TechWarmUp2-SlotMachine/node_modules/.bin/stylelint.cmd\" \"//wsl.localhost/Ubuntu/root/110/TechWarmUp2-SlotMachine/src/client/scss/_animations.scss\" \"//wsl.localhost/Ubuntu/root/110/TechWarmUp2-SlotMachine/src/client/scss/_layout.scss\" \"//wsl.localhost/Ubuntu/root/110/TechWarmUp2-SlotMachine/src/client/scss/_variables.scss\")",
       "PowerShell(wsl -e bash -c \"cd /root/110/TechWarmUp2-SlotMachine && git checkout src/client/css/styles.css 2>&1\")",
-      "PowerShell(wsl -e bash -c \"cd /root/110/TechWarmUp2-SlotMachine && wc -c src/client/css/styles.css\")"
+      "PowerShell(wsl -e bash -c \"cd /root/110/TechWarmUp2-SlotMachine && wc -c src/client/css/styles.css\")",
+      "Bash(git rm *)"
     ]
   }
 }

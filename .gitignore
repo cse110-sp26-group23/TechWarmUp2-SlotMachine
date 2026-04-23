@@ -4,6 +4,7 @@
 .DS_Store
 ignore*-
 node_modules/
+.sass-cache/
 server/.env
 client/css/styles.css
 test-results/
