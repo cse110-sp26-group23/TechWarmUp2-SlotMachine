@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hoops Slots — Basketball Slot Machine</title>
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
   </head>
   <body>
 
@@ -262,6 +265,49 @@
 
     <!-- Visual effects layer (populated by effects.js) -->
     <div class="particles-container" id="particlesContainer" aria-hidden="true"></div>
+
+    <!-- Privacy & Disclaimer Consent Modal (shown on first load) -->
+    <div class="consent-modal" id="consentModal" role="dialog" aria-modal="true" aria-labelledby="consentTitle">
+      <div class="consent-modal__panel">
+        <div class="consent-modal__header">
+          <span class="consent-modal__logo" aria-hidden="true">🏀</span>
+          <h2 class="consent-modal__title" id="consentTitle">Hoops Slots</h2>
+        </div>
+
+        <div class="consent-modal__badge">For Entertainment Purposes Only</div>
+
+        <div class="consent-modal__body">
+          <p class="consent-modal__lead">
+            This is a <strong>free-to-play</strong> game. No real money, no gambling, no deposits — ever.
+          </p>
+
+          <details class="consent-modal__policy">
+            <summary class="consent-modal__policy-toggle">Privacy Policy</summary>
+            <div class="consent-modal__policy-body">
+              <ul>
+                <li>This app does not collect or store any personal data.</li>
+                <li>No cookies are used for tracking or analytics.</li>
+                <li>Credits are virtual and reset on every page reload — they have no real-world value.</li>
+                <li>Sounds play by default; you can mute them at any time using the 🔊 button.</li>
+                <li>Game outcomes are determined by a server-side random number generator.</li>
+              </ul>
+            </div>
+          </details>
+
+          <p class="consent-modal__disclaimer">
+            Hoops Slots is intended <strong>for entertainment purposes only</strong>. It is not affiliated with the NBA or any professional sports organisation, and does not constitute gambling.
+          </p>
+        </div>
+
+        <button
+          class="consent-modal__agree"
+          id="consentAgree"
+          type="button"
+        >
+          I Agree &mdash; Let&rsquo;s Play! 🏀
+        </button>
+      </div>
+    </div>
 
     <!-- Debug modal (portal at body level) -->
     <div class="debug-modal" id="debugModal" role="dialog" aria-modal="true" aria-labelledby="debugModalTitle" hidden>

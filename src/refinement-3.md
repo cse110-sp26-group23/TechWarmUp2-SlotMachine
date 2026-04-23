@@ -16,4 +16,8 @@ You are refining a browser-based slot machine app. Make sure to continue to adhe
 
 5. Make it so that the actual slot icons in the reel can be replaced with images, the emojis should be a fallback if images aren't included.
 
+6. Make sure that all the sound effect and visual assets that have been added are being correctly loaded in code.
+
+7. Make sure that the background of UI is more solid so that it shows up on top of the background images, some of the stuff is transparent and that is causing issues, see point 4 about how the interface should look different.
+
 Always make sure to check work against ai-plan.md and test.

@@ -127,23 +127,33 @@ function spawnLightBursts() {
 
 /**
  * Displays a large basketball-themed win message overlay using a GSAP timeline.
+ * The message renders inside a scoreboard-style panel for the LED/jumbotron look.
  * @param {'jackpot'|'big'|'small'} tier - Win tier determining the message pool and style.
  */
 function showSlamText(tier) {
   const pool = SLAM_MESSAGES[tier] ?? SLAM_MESSAGES.small;
   const message = pool[Math.floor(Math.random() * pool.length)];
 
-  const el = document.createElement('div');
-  el.className = `slam-text${tier === 'small' ? ' slam-text--subtle' : ''}`;
-  el.textContent = message;
-  el.setAttribute('aria-hidden', 'true');
-  document.body.appendChild(el);
+  const overlay = document.createElement('div');
+  overlay.className = `slam-text${tier === 'small' ? ' slam-text--subtle' : ''}`;
+  overlay.setAttribute('aria-hidden', 'true');
+
+  const panel = document.createElement('div');
+  panel.className = 'slam-text__panel';
+  panel.textContent = message;
+  overlay.appendChild(panel);
+
+  document.body.appendChild(overlay);
 
   const displayMs = tier === 'small' ? 1400 : 2200;
 
+  // Use timeline position parameter (+=) not tween delay so the overlay removal
+  // fires only after the panel has finished fading, not at the same start position.
   gsap.timeline()
-    .fromTo(el, { scale: 1.3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(1.5)' })
-    .to(el, { opacity: 0, scale: 0.95, duration: 0.3, ease: 'power2.in', delay: displayMs / 1000, onComplete: () => el.remove() });
+    .fromTo(panel, { scale: 1.1, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' })
+    .fromTo(overlay, { opacity: 0 }, { opacity: 1, duration: 0.2 }, '<')
+    .to(panel, { opacity: 0, scale: 0.95, duration: 0.3, ease: 'power2.in' }, `+=${displayMs / 1000}`)
+    .to(overlay, { opacity: 0, duration: 0.4, onComplete: () => overlay.remove() }, '<');
 }
 
 export { addScreenFlash, spawnConfetti, spawnBouncingBalls, spawnLightBursts, showSlamText };

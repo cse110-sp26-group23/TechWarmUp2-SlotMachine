@@ -31,6 +31,7 @@ $color-tier-grand: #fc0;
 // Typography
 $font-primary: 'Segoe UI', system-ui, -apple-system, sans-serif;
 $font-digital: 'Courier New', 'Lucida Console', monospace;
+$font-scoreboard: 'Orbitron', 'Courier New', monospace;
 $font-size-base: 16px;
 $font-size-xs: 0.75rem;
 $font-size-sm: 0.875rem;
@@ -65,3 +66,4 @@ $z-layer-information: 10;
 $z-layer-action: 20;
 $z-layer-control: 30;
 $z-overlay-debug: 200;
+$z-modal-consent: 300;

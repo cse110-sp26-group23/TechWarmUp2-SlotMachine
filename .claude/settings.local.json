@@ -35,7 +35,21 @@
       "Bash(wsl *)",
       "Bash(node_modules/.bin/stylelint \"src/client/scss/**/*.scss\")",
       "Bash(node_modules/.bin/htmlhint src/client/index.html)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Read(///wsl.localhost/Ubuntu/root/**)",
+      "PowerShell(wsl -e bash -c \"cd /root/110/TechWarmUp2-SlotMachine && npm run build:css 2>&1\")",
+      "PowerShell(wsl -e bash -c \"cd /root/110/TechWarmUp2-SlotMachine && node_modules/.bin/sass src/client/scss/main.scss src/client/css/styles.css --style=compressed 2>&1\")",
+      "PowerShell(wsl -e bash -c \"node --version && which node 2>&1\")",
+      "PowerShell(wsl -e bash -c \"ls /root/110/TechWarmUp2-SlotMachine/src/client/css/ 2>&1\")",
+      "PowerShell(wsl -e bash -c \"which sass 2>&1 || echo 'not found'\")",
+      "PowerShell(wsl -e bash -c \"cd /root/110/TechWarmUp2-SlotMachine && sass src/client/scss/main.scss src/client/css/styles.css --style=compressed 2>&1\")",
+      "Bash(sass *)",
+      "Bash(npx eslint *)",
+      "PowerShell(wsl -e bash -c \"cd /root/110/TechWarmUp2-SlotMachine && node --version && npx --version 2>&1 | head -5\")",
+      "PowerShell(wsl -e bash -c \"cd /root/110/TechWarmUp2-SlotMachine && node_modules/.bin/eslint --version 2>&1\")",
+      "Bash(\"//wsl.localhost/Ubuntu/root/110/TechWarmUp2-SlotMachine/node_modules/.bin/stylelint.cmd\" \"//wsl.localhost/Ubuntu/root/110/TechWarmUp2-SlotMachine/src/client/scss/_animations.scss\" \"//wsl.localhost/Ubuntu/root/110/TechWarmUp2-SlotMachine/src/client/scss/_layout.scss\" \"//wsl.localhost/Ubuntu/root/110/TechWarmUp2-SlotMachine/src/client/scss/_variables.scss\")",
+      "PowerShell(wsl -e bash -c \"cd /root/110/TechWarmUp2-SlotMachine && git checkout src/client/css/styles.css 2>&1\")",
+      "PowerShell(wsl -e bash -c \"cd /root/110/TechWarmUp2-SlotMachine && wc -c src/client/css/styles.css\")"
     ]
   }
 }

@@ -66,6 +66,8 @@ const debugModal = document.getElementById('debugModal');
 const debugModalClose = document.getElementById('debugModalClose');
 const debugTriggers = document.querySelectorAll('.debug-modal__trigger');
 const tierGrandEl = document.getElementById('tierGrand');
+const consentModal = document.getElementById('consentModal');
+const consentAgree = document.getElementById('consentAgree');
 
 /**
  * Reads the --reel-cell-height CSS custom property set by the SCSS responsive rules.
@@ -523,6 +525,19 @@ function initPaytableImages() {
   });
 }
 
+/**
+ * Shows the privacy and disclaimer consent modal on first load.
+ * Hides the modal and focuses the spin button when the user agrees.
+ */
+function initConsentModal() {
+  consentAgree.addEventListener('click', () => {
+    consentModal.setAttribute('hidden', '');
+    spinButton.focus();
+  });
+
+  consentAgree.focus();
+}
+
 // Seed all reels with staggered symbols on first load
 (function initReels() {
   for (let i = 0; i < 5; i++) {
@@ -535,5 +550,6 @@ function initPaytableImages() {
 
 refreshBetDisplay();
 updateCreditsDisplay(currentCredits);
+initConsentModal();
 initDevMode();
 initPaytableImages();

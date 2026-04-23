@@ -45,6 +45,20 @@
   100% { transform: scale(1.6); opacity: 0; }
 }
 
+// Scoreboard LED flicker — subtle buzz on the panel border
+@keyframes scoreboard-buzz {
+  0%, 100% { box-shadow: 0 0 24px var(--sb-glow), 0 0 60px var(--sb-glow-far), inset 0 0 24px rgb(0 0 0 / 80%); }
+  45%       { box-shadow: 0 0 36px var(--sb-glow), 0 0 80px var(--sb-glow-far), inset 0 0 24px rgb(0 0 0 / 80%); }
+  50%       { box-shadow: 0 0 10px var(--sb-glow), 0 0 30px var(--sb-glow-far), inset 0 0 24px rgb(0 0 0 / 80%); }
+  95%       { box-shadow: 0 0 32px var(--sb-glow), 0 0 70px var(--sb-glow-far), inset 0 0 24px rgb(0 0 0 / 80%); }
+}
+
+// Scoreboard scan-line overlay (subtle horizontal lines)
+@keyframes scanline-scroll {
+  from { background-position: 0 0; }
+  to   { background-position: 0 8px; }
+}
+
 .slam-text {
   position: fixed;
   inset: 0;
@@ -52,32 +66,64 @@
   align-items: center;
   justify-content: center;
   z-index: $z-flash;
-  background: rgb(0 0 0 / 80%);
-  font-size: clamp(3rem, 11vw, 7rem);
-  font-weight: 900;
-  color: $color-gold;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  text-align: center;
-  padding: $space-xl;
+  background: rgb(0 0 0 / 82%);
   pointer-events: none;
-  text-shadow:
-    0 0 40px rgb(255 204 0 / 70%),
-    0 4px 14px rgb(0 0 0 / 90%),
-    0 0 80px rgb(255 107 26 / 40%);
 
+  // Scoreboard jumbotron panel — animated by GSAP, styled here
+  &__panel {
+    --sb-glow: rgb(255 204 0 / 55%);
+    --sb-glow-far: rgb(255 107 26 / 25%);
+
+    background:
+      repeating-linear-gradient(
+        0deg,
+        rgb(0 0 0 / 0%) 0px,
+        rgb(0 0 0 / 0%) 3px,
+        rgb(0 0 0 / 18%) 3px,
+        rgb(0 0 0 / 18%) 4px
+      ),
+      linear-gradient(180deg, #050c1a 0%, #020509 100%);
+    border: 3px solid $color-gold;
+    border-radius: $radius-md;
+    padding: $space-md $space-lg;
+    max-width: min(640px, 92vw);
+    font-family: $font-scoreboard;
+    font-size: clamp(1.5rem, 5vw, 2.8rem);
+    font-weight: 900;
+    color: $color-gold;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: center;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    text-shadow:
+      0 0 12px rgb(255 204 0 / 90%),
+      0 0 36px rgb(255 204 0 / 50%),
+      0 0 3px $color-gold;
+    animation: scoreboard-buzz 0.9s ease-in-out infinite;
+  }
+
+  // Small-win subtle variant
   &--subtle {
     inset: unset;
-    top: 32%;
+    top: 30%;
     left: 0;
     right: 0;
-    background: rgb(0 0 0 / 68%);
-    font-size: clamp(1.8rem, 6vw, 3rem);
-    color: $color-win-small;
-    padding: $space-md $space-xl;
-    text-shadow:
-      0 0 20px rgb(76 175 80 / 55%),
-      0 2px 8px rgb(0 0 0 / 80%);
+    background: rgb(0 0 0 / 72%);
+
+    .slam-text__panel {
+      --sb-glow: rgb(76 175 80 / 55%);
+      --sb-glow-far: rgb(76 175 80 / 20%);
+
+      border-color: $color-win-small;
+      font-size: clamp(1.1rem, 3.5vw, 2rem);
+      color: $color-win-small;
+      padding: $space-sm $space-md;
+      text-shadow:
+        0 0 10px rgb(76 175 80 / 80%),
+        0 0 28px rgb(76 175 80 / 40%);
+    }
   }
 }
 

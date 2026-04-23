@@ -244,3 +244,177 @@ body {
   z-index: $z-particles;
   overflow: hidden;
 }
+
+// Privacy & disclaimer consent modal — shown on first load, hidden after agreement
+.consent-modal {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 90%);
+  z-index: $z-modal-consent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-md;
+
+  &[hidden] {
+    display: none;
+  }
+
+  &__panel {
+    background: linear-gradient(180deg, #0c1428 0%, #060a12 100%);
+    border: 2px solid $color-accent;
+    border-radius: $radius-lg;
+    width: min(480px, 92vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: $space-xl;
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+    box-shadow:
+      0 0 40px rgb(255 107 26 / 35%),
+      0 8px 32px rgb(0 0 0 / 70%);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-sm;
+  }
+
+  &__logo {
+    font-size: $font-size-2xl;
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: 900;
+    color: $color-accent;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px rgb(255 107 26 / 60%);
+  }
+
+  &__badge {
+    background: $color-gold;
+    color: #000;
+    font-size: $font-size-xs;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    text-align: center;
+    padding: $space-xs $space-md;
+    border-radius: $radius-sm;
+    align-self: center;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+  }
+
+  &__lead {
+    font-size: $font-size-sm;
+    color: $color-text;
+    text-align: center;
+    line-height: 1.55;
+  }
+
+  &__policy {
+    background: $color-surface;
+    border: 1px solid $color-surface-glass-border;
+    border-radius: $radius-sm;
+    overflow: hidden;
+
+    &-toggle {
+      padding: $space-xs $space-sm;
+      font-size: $font-size-xs;
+      font-weight: bold;
+      color: $color-text-muted;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      list-style: none;
+
+      &::-webkit-details-marker { display: none; }
+
+      &::before {
+        content: '▶ ';
+        font-size: 0.6em;
+        vertical-align: middle;
+      }
+    }
+
+    &-body {
+      padding: $space-xs $space-sm $space-sm;
+      font-size: $font-size-xs;
+      color: $color-text-muted;
+      line-height: 1.6;
+
+      ul {
+        padding-left: $space-md;
+        display: flex;
+        flex-direction: column;
+        gap: $space-xs;
+      }
+    }
+  }
+
+  // CSS-only open indicator for the details element
+  details[open] .consent-modal__policy-toggle::before {
+    content: '▼ ';
+  }
+
+  &__disclaimer {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    text-align: center;
+    line-height: 1.55;
+    border-top: 1px solid $color-border;
+    padding-top: $space-sm;
+  }
+
+  &__agree {
+    width: 100%;
+    padding: $space-md;
+    background:
+      linear-gradient(160deg,
+        #ff9f60 0%,
+        #e86020 22%,
+        #c84808 52%,
+        #9c3604 80%,
+        #701c00 100%
+      );
+    color: #fff;
+    border: 3px solid #5a1000;
+    border-top-color: rgb(255 180 100 / 45%);
+    border-radius: $radius-pill;
+    font-size: $font-size-lg;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-shadow: 0 2px 6px rgb(0 0 0 / 80%);
+    box-shadow:
+      0 8px 32px rgb(180 60 10 / 70%),
+      0 3px 6px rgb(0 0 0 / 50%),
+      inset 0 3px 0 rgb(255 180 80 / 30%),
+      inset 0 -4px 0 rgb(0 0 0 / 40%);
+    transition: filter 0.15s ease, transform 0.1s ease;
+
+    &:hover {
+      filter: brightness(1.12);
+    }
+
+    &:active {
+      transform: scale(0.97) translateY(1px);
+    }
+
+    &:focus-visible {
+      outline: 3px solid $color-gold;
+      outline-offset: 3px;
+    }
+  }
+}

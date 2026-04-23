@@ -557,3 +557,87 @@ Read and analysed all key source files: `ui.js`, `audio.js`, `effects.js`, `api.
 
 **Time:** 8m 12s
 **Tokens:** 22.4k
+
+---
+
+## Entry 19 — Claude Code (Refinement 5: Consent Modal & Scoreboard Celebration Font)
+
+**Goal:** Add a startup privacy policy / entertainment disclaimer modal that the user must agree to before playing; restyle win celebration popups with a scoreboard/jumbotron LED font and panel.
+
+**Prompt:** "Add a pop-up on start that makes the user agree to a privacy policy and has a disclaimer that this is only for entertainment. Give the popups that come up on screen as celebration a scoreboard or buzzer vibe with a matching font."
+
+**Summary:**
+
+1. **`src/client/index.html`** — Three additions:
+   - Added `<link>` tags for Google Fonts preconnect + Orbitron (weights 700 and 900) loaded with `display=swap`.
+   - Added `.consent-modal` HTML: a full-screen overlay with a branded panel containing the app logo/title, "For Entertainment Purposes Only" badge, a lead disclaimer, an expandable `<details>` privacy policy (no data collection, no real money, virtual credits only, server-side RNG), a legal disclaimer paragraph, and an "I Agree — Let's Play! 🏀" button.
+
+2. **`src/client/scss/_variables.scss`** — Added `$font-scoreboard: 'Orbitron', 'Courier New', monospace` and `$z-modal-consent: 300` (above debug overlay at 200).
+
+3. **`src/client/scss/_layout.scss`** — Added full `.consent-modal` BEM block: fixed full-screen overlay at z-index 300, branded panel with orange border/glow, gold "For Entertainment Only" badge, collapsible privacy policy `<details>`, orange agree button matching the spin button's skeuomorphic style. Modal hides via `[hidden]` attribute.
+
+4. **`src/client/scss/_animations.scss`** — Redesigned `.slam-text` for scoreboard/jumbotron look:
+   - Added `@keyframes scoreboard-buzz` — pulsing glow on the panel border via CSS custom properties `--sb-glow` and `--sb-glow-far`.
+   - Changed `.slam-text` from a single text-bearing overlay to a flex container holding a `.slam-text__panel` child.
+   - `.slam-text__panel` uses `$font-scoreboard` (Orbitron), scan-line texture (`repeating-linear-gradient`), dark arena background, gold border, LED text-shadow, and the `scoreboard-buzz` animation.
+   - `.slam-text--subtle` overrides the panel to green for small wins.
+
+5. **`src/client/js/effects.js`** — Updated `showSlamText()` to create an inner `div.slam-text__panel` element containing the message text, appended inside the overlay `div`. GSAP timeline now animates the panel (`scale`, `opacity`) and the overlay separately — panel slams in with `back.out(1.8)` ease, overlay fades in simultaneously, both fade out together after the display duration.
+
+6. **`src/client/js/ui.js`** — Added `consentModal` and `consentAgree` DOM references. Added `initConsentModal()` function that focuses the agree button on load and adds a click listener that hides the modal (via `setAttribute('hidden', '')`) and moves focus to the spin button. Called at startup alongside `initDevMode()`.
+
+7. **`src/client/css/styles.css`** — Recompiled using Dart Sass (node_modules/sass/sass.js, v1.99.0); output grew from ~15 KB to ~18.8 KB with all new selectors confirmed present.
+
+**Reflection:**
+- The Ruby Sass 3.7.4 in PATH (`/mnt/c/Ruby34-x64/bin/sass`) does not support `@use` and silently writes just the raw import statements — it corrupted the CSS file on a first attempt. The fix was `git checkout src/client/css/styles.css` then running the Dart Sass binary directly (`node node_modules/sass/sass.js`) from the project directory to avoid UNC-path issues.
+- ESLint passed on both modified JS files with zero errors.
+- SCSS compiled without warnings; CSS file size confirms all new rules were emitted.
+
+**Commit Hash:** TBD
+
+**Time:** 11m 54s
+**Tokens:** 18.2k
+
+---
+
+## Entry 20 — Claude Code (Refinement 5 Bug Fixes: GSAP Timing & Panel Sizing)
+
+**Goal:** Fix two bugs introduced in Entry 19: (1) the GSAP animation in `showSlamText()` causing the slam-text overlay to be removed after ~0.55 s instead of the full display duration, which made DEV_MODE force-spin celebrations look broken; (2) the scoreboard panel font/padding being too large for the `min(560px, 92vw)` container, causing potential overflow.
+
+**Prompt:** "Fix these things: DEV_MODE is not working. The new celebrations aren't always fitting correctly in their boxes, ensure that they are. Then create entry 20 in the ai-use-log"
+
+**Summary:**
+
+**Root cause of the DEV_MODE / celebration issue:**
+The `showSlamText()` GSAP timeline used `delay: displayMs / 1000` as a tween property on the panel fade-out, then used `'<'` as the timeline position parameter on the overlay fade-out. In GSAP, `'<'` means "start at the same START position as the previous tween" — so the overlay tween started at t=0.35 s (not after the delay expired). The overlay (duration 0.2 s) finished and called `overlay.remove()` at t=0.55 s, removing the panel from the DOM while the panel was still in its delay phase. The slam text was visible for only 0.55 s instead of 1.4–2.2 s.
+
+**Root cause of panel overflow:**
+Orbitron (a wide display font) at `clamp(2rem, 8vw, 5rem)` with `letter-spacing: 0.1em` and horizontal padding of `$space-2xl` (48 px each side) produced text wider than the `min(560px, 92vw)` panel on most viewports. Single-word messages like "CHAMPIONSHIP!" had no wrap point and would exceed the panel width.
+
+**Fixes:**
+
+1. **`src/client/js/effects.js`** — Corrected the GSAP timeline position parameters in `showSlamText()`:
+   - Replaced `delay: displayMs / 1000` tween property with `+=${displayMs / 1000}` as the timeline position parameter on the panel fade-out tween. This inserts the tween `displayMs` ms after the END of the previous animation, not at its start.
+   - The overlay fade-out now uses `'<'` against the corrected panel fade-out position, so both the panel and overlay fade simultaneously after the display period.
+   - Increased overlay fade-out duration from 0.2 s to 0.4 s so `overlay.remove()` fires only after the panel finishes fading.
+   - Reduced panel slam-in starting scale from `1.25` → `1.1` to avoid the panel briefly exceeding the overlay bounds on smaller screens.
+
+2. **`src/client/scss/_animations.scss`** — Tightened the scoreboard panel sizing:
+   - Font size: `clamp(2rem, 8vw, 5rem)` → `clamp(1.5rem, 5vw, 2.8rem)` — still impactful, fits longest messages on one line at desktop.
+   - Horizontal padding: `$space-lg $space-2xl` → `$space-md $space-lg` — reduces horizontal padding from 96 px to 48 px total, giving the text substantially more room.
+   - Max-width: `min(560px, 92vw)` → `min(640px, 92vw)` — wider panel on desktop.
+   - Letter-spacing: `0.1em` → `0.06em` — Orbitron's built-in spacing is already generous.
+   - Added `overflow-wrap: break-word` and `word-break: break-word` as final safety net for any single-word message that still overflows.
+   - Subtle (small win) panel: `clamp(1.4rem, 5vw, 2.8rem)` → `clamp(1.1rem, 3.5vw, 2rem)`, padding reduced from `$space-md $space-xl` to `$space-sm $space-md`.
+
+3. **`src/client/css/styles.css`** — Recompiled using `node node_modules/sass/sass.js` (Dart Sass 1.99.0). Correct selectors and values confirmed via grep.
+
+**Reflection:**
+- The GSAP `delay` tween property vs timeline `+=` position parameter distinction is subtle: tween `delay` pads the tween's internal start but the timeline still marks the TWEEN'S start position for the next `'<'` insertion. Using `+=` instead makes the timeline advance past the gap before inserting the fade-out tweens.
+- The panel overflow was straightforward to predict from Orbitron's character metrics (~0.75 em advance width per cap glyph + letter-spacing) against the panel's available text area.
+- ESLint: zero errors on `effects.js`. SCSS compiled without warnings.
+
+**Commit Hash:** TBD
+
+**Time:** 5m 35s
+**Tokens:** 8.5k
